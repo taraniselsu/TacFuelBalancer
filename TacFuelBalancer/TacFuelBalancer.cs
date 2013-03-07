@@ -328,8 +328,6 @@ public class TacFuelBalancer : PartModule
 
         protected override void Draw(int windowID)
         {
-            SetSize(10, 10);
-
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
             buttonStyle.padding = new RectOffset(5, 5, 3, 0);
             buttonStyle.margin = new RectOffset(1, 1, 1, 1);
@@ -410,6 +408,11 @@ public class TacFuelBalancer : PartModule
             GUILayout.EndVertical();
 
             GUI.DragWindow();
+
+            if (GUI.changed)
+            {
+                SetSize(10, 10);
+            }
         }
     }
 
