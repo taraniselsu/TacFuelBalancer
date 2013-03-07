@@ -40,8 +40,6 @@ public class TacFuelBalancer : PartModule
     private int numberParts;
     private string filename;
     private double lastUpdate;
-
-    [KSPField(isPersistant=true)]
     private double maxFuelFlow;
 
     public override void OnAwake()
@@ -55,7 +53,7 @@ public class TacFuelBalancer : PartModule
 
         filename = IOUtils.GetFilePathFor(this.GetType(), "TacFuelBalancer.cfg");
 
-        maxFuelFlow = 25.0;
+        maxFuelFlow = 100.0;
     }
 
     public override void OnLoad(ConfigNode node)
@@ -72,14 +70,19 @@ public class TacFuelBalancer : PartModule
             {
                 config = ConfigNode.Load(filename);
                 Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: loaded from file: " + config);
+
+                mainWindow.Load(config, "mainWindow");
+
+                double newDoubleValue;
+                if (config.HasValue("maxFuelFlow") && double.TryParse(config.GetValue("maxFuelFlow"), out newDoubleValue))
+                {
+                    maxFuelFlow = newDoubleValue;
+                }
             }
             else
             {
                 Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to load file: file does not exist");
-                return;
             }
-
-            mainWindow.Load(config, "mainWindow");
         }
         catch
         {
@@ -96,6 +99,7 @@ public class TacFuelBalancer : PartModule
             ConfigNode config = new ConfigNode();
 
             mainWindow.Save(config, "mainWindow");
+            config.AddValue("maxFuelFlow", maxFuelFlow);
 
             config.Save(filename);
             Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: saved to file: " + config);
@@ -198,7 +202,7 @@ public class TacFuelBalancer : PartModule
                                 if (pair.percentFull > totalPercentFull)
                                 {
                                     double adjustmentAmount = (pair.partInfo.resource.maxAmount * totalPercentFull) - pair.partInfo.resource.amount;
-                                    double amountToTake = Math.Min(Math.Min(maxFuelFlow * deltaTime / (pairs.Count - 1), -adjustmentAmount), amountLeftToMove);
+                                    double amountToTake = Math.Min(Math.Min(maxFuelFlow * deltaTime / pairs.Count, -adjustmentAmount), amountLeftToMove);
                                     pair.partInfo.resource.amount -= amountToTake;
                                     amountLeftToMove -= amountToTake;
                                 }
