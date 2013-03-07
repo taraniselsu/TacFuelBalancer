@@ -41,10 +41,15 @@ public class TacFuelBalancer : PartModule
     private string filename;
     private double lastUpdate;
     private double maxFuelFlow;
+    private bool debug;
 
     public override void OnAwake()
     {
         base.OnAwake();
+        if (debug)
+        {
+            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnAwake");
+        }
 
         mainWindow = new MainWindow(this);
 
@@ -54,6 +59,7 @@ public class TacFuelBalancer : PartModule
         filename = IOUtils.GetFilePathFor(this.GetType(), "TacFuelBalancer.cfg");
 
         maxFuelFlow = 100.0;
+        debug = false;
     }
 
     public override void OnLoad(ConfigNode node)
@@ -69,7 +75,10 @@ public class TacFuelBalancer : PartModule
             if (File.Exists<TacFuelBalancer>(filename))
             {
                 config = ConfigNode.Load(filename);
-                Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: loaded from file: " + config);
+                if (debug)
+                {
+                    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: loaded from file: " + config);
+                }
 
                 mainWindow.Load(config, "mainWindow");
 
@@ -78,15 +87,21 @@ public class TacFuelBalancer : PartModule
                 {
                     maxFuelFlow = newDoubleValue;
                 }
+
+                bool newBoolValue;
+                if (config.HasValue("debug") && bool.TryParse(config.GetValue("debug"), out newBoolValue))
+                {
+                    debug = newBoolValue;
+                }
             }
             else
             {
-                Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to load file: file does not exist");
+                Debug.LogWarning("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to load file: file does not exist");
             }
         }
         catch
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to load file: an exception was thrown.");
+            Debug.LogWarning("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to load file: an exception was thrown.");
         }
     }
 
@@ -100,19 +115,27 @@ public class TacFuelBalancer : PartModule
 
             mainWindow.Save(config, "mainWindow");
             config.AddValue("maxFuelFlow", maxFuelFlow);
+            config.AddValue("debug", debug);
 
             config.Save(filename);
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: saved to file: " + config);
+            if (debug)
+            {
+                Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: saved to file: " + config);
+            }
         }
         catch
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to save config file");
+            Debug.LogWarning("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: failed to save config file");
         }
     }
 
     public override void OnStart(PartModule.StartState state)
     {
         base.OnStart(state);
+        if (debug)
+        {
+            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnStart: " + state);
+        }
 
         if (state != StartState.Editor)
         {
@@ -273,12 +296,17 @@ public class TacFuelBalancer : PartModule
         }
         catch
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: error in OnUpdate");
+            Debug.LogWarning("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: error in OnUpdate");
         }
     }
 
     public void CleanUp()
     {
+        if (debug)
+        {
+            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: CleanUp");
+        }
+
         mainWindow.SetVisible(false);
     }
 
