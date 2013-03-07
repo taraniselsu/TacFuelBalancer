@@ -46,10 +46,7 @@ public class TacFuelBalancer : PartModule
     public override void OnAwake()
     {
         base.OnAwake();
-        if (debug)
-        {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnAwake");
-        }
+        Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnAwake");
 
         mainWindow = new MainWindow(this);
 
@@ -75,11 +72,6 @@ public class TacFuelBalancer : PartModule
             if (File.Exists<TacFuelBalancer>(filename))
             {
                 config = ConfigNode.Load(filename);
-                if (debug)
-                {
-                    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: loaded from file: " + config);
-                }
-
                 mainWindow.Load(config, "mainWindow");
 
                 double newDoubleValue;
@@ -92,6 +84,11 @@ public class TacFuelBalancer : PartModule
                 if (config.HasValue("debug") && bool.TryParse(config.GetValue("debug"), out newBoolValue))
                 {
                     debug = newBoolValue;
+                }
+
+                if (debug)
+                {
+                    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: loaded from file: " + config);
                 }
             }
             else
@@ -163,6 +160,8 @@ public class TacFuelBalancer : PartModule
 
                     foreach (Part part in vessel.parts)
                     {
+                        // Debug.Log("Vessel stage: " + vessel.currentStage + "; Part stage: " + part.inverseStage);
+
                         foreach (PartResource resource in part.Resources)
                         {
                             PartResourceMap partInfo = new PartResourceMap();
