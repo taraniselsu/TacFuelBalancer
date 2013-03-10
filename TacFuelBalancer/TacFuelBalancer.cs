@@ -41,6 +41,8 @@ public class TacFuelBalancer : PartModule
     private string filename;
     private double lastUpdate;
     private double maxFuelFlow;
+    private double fuelWarningLevel;
+    private double fuelCriticalLevel;
     private bool debug;
 
     public override void OnAwake()
@@ -56,6 +58,9 @@ public class TacFuelBalancer : PartModule
         filename = IOUtils.GetFilePathFor(this.GetType(), "TacFuelBalancer.cfg");
 
         maxFuelFlow = 100.0;
+        fuelWarningLevel = 25.0;
+        fuelCriticalLevel = 5.0;
+
         debug = false;
     }
 
@@ -78,6 +83,14 @@ public class TacFuelBalancer : PartModule
                 if (config.HasValue("maxFuelFlow") && double.TryParse(config.GetValue("maxFuelFlow"), out newDoubleValue))
                 {
                     maxFuelFlow = newDoubleValue;
+                }
+                if (config.HasValue("fuelWarningLevel") && double.TryParse(config.GetValue("fuelWarningLevel"), out newDoubleValue))
+                {
+                    fuelWarningLevel = newDoubleValue;
+                }
+                if (config.HasValue("fuelCriticalLevel") && double.TryParse(config.GetValue("fuelCriticalLevel"), out newDoubleValue))
+                {
+                    fuelCriticalLevel = newDoubleValue;
                 }
 
                 bool newBoolValue;
@@ -112,6 +125,8 @@ public class TacFuelBalancer : PartModule
 
             mainWindow.Save(config, "mainWindow");
             config.AddValue("maxFuelFlow", maxFuelFlow);
+            config.AddValue("fuelWarningLevel", fuelWarningLevel);
+            config.AddValue("fuelCriticalLevel", fuelCriticalLevel);
             config.AddValue("debug", debug);
 
             config.Save(filename);
@@ -368,6 +383,7 @@ public class TacFuelBalancer : PartModule
             GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
             labelStyle.wordWrap = false;
             labelStyle.margin.right += 3;
+            labelStyle.fontStyle = FontStyle.Normal;
 
             GUILayout.BeginVertical();
 
@@ -396,6 +412,19 @@ public class TacFuelBalancer : PartModule
                         PartResource resource = partInfo.resource;
                         Part part = partInfo.part;
                         double percentFull = resource.amount / resource.maxAmount * 100.0;
+
+                        if (percentFull < parent.fuelCriticalLevel)
+                        {
+                            labelStyle.normal.textColor = Color.red;
+                        }
+                        else if (percentFull < parent.fuelWarningLevel)
+                        {
+                            labelStyle.normal.textColor = Color.yellow;
+                        }
+                        else
+                        {
+                            labelStyle.normal.textColor = Color.white;
+                        }
 
                         GUILayout.BeginHorizontal();
                         partInfo.isSelected = GUILayout.Toggle(partInfo.isSelected, "S", buttonStyle2);
