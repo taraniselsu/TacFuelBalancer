@@ -310,20 +310,23 @@ public class TacFuelBalancer : PartModule
         {
             foreach (PartResource resource in part.Resources)
             {
-                if (resources.ContainsKey(resource.resourceName))
+                if (resource.info.resourceTransferMode == ResourceTransferMode.PUMP)
                 {
-                    List<PartResourceMap> resourceParts = resources[resource.resourceName].parts;
-                    if (!resourceParts.Exists(partInfo => partInfo.part.Equals(part)))
+                    if (resources.ContainsKey(resource.resourceName))
                     {
-                        resourceParts.Add(new PartResourceMap(part, resource));
+                        List<PartResourceMap> resourceParts = resources[resource.resourceName].parts;
+                        if (!resourceParts.Exists(partInfo => partInfo.part.Equals(part)))
+                        {
+                            resourceParts.Add(new PartResourceMap(part, resource));
+                        }
                     }
-                }
-                else
-                {
-                    MyResourceInfo resourceInfo = new MyResourceInfo();
-                    resourceInfo.parts.Add(new PartResourceMap(part, resource));
+                    else
+                    {
+                        MyResourceInfo resourceInfo = new MyResourceInfo();
+                        resourceInfo.parts.Add(new PartResourceMap(part, resource));
 
-                    resources[resource.resourceName] = resourceInfo;
+                        resources[resource.resourceName] = resourceInfo;
+                    }
                 }
             }
         }
