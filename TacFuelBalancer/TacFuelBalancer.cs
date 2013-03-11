@@ -169,33 +169,7 @@ public class TacFuelBalancer : PartModule
 
                 if (numberParts != vessel.parts.Count)
                 {
-                    // Rebuild our lists because something changed
-                    numberParts = vessel.parts.Count;
-                    resources.Clear();
-
-                    foreach (Part part in vessel.parts)
-                    {
-                        // Debug.Log("Vessel stage: " + vessel.currentStage + "; Part stage: " + part.inverseStage);
-
-                        foreach (PartResource resource in part.Resources)
-                        {
-                            PartResourceMap partInfo = new PartResourceMap();
-                            partInfo.part = part;
-                            partInfo.resource = resource;
-
-                            if (resources.ContainsKey(resource.resourceName))
-                            {
-                                resources[resource.resourceName].parts.Add(partInfo);
-                            }
-                            else
-                            {
-                                MyResourceInfo resourceInfo = new MyResourceInfo();
-                                resourceInfo.parts.Add(partInfo);
-
-                                resources[resource.resourceName] = resourceInfo;
-                            }
-                        }
-                    }
+                    rebuildLists();
                 }
 
                 // Do any fuel transfers
@@ -312,6 +286,50 @@ public class TacFuelBalancer : PartModule
         {
             Debug.LogWarning("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: error in OnUpdate");
         }
+    }
+
+    private void rebuildLists()
+    {
+        List<string> toDelete = new List<string>();
+        foreach (KeyValuePair<string, MyResourceInfo> resourceEntry in resources)
+        {
+            resourceEntry.Value.parts.RemoveAll(partInfo => !vessel.parts.Contains(partInfo.part));
+
+            if (resourceEntry.Value.parts.Count == 0)
+            {
+                toDelete.Add(resourceEntry.Key);
+            }
+        }
+
+        foreach (string key in toDelete)
+        {
+            resources.Remove(key);
+        }
+
+        foreach (Part part in vessel.parts)
+        {
+            foreach (PartResource resource in part.Resources)
+            {
+                if (resources.ContainsKey(resource.resourceName))
+                {
+                    List<PartResourceMap> resourceParts = resources[resource.resourceName].parts;
+                    if (!resourceParts.Exists(partInfo => partInfo.part.Equals(part)))
+                    {
+                        resourceParts.Add(new PartResourceMap(part, resource));
+                    }
+                }
+                else
+                {
+                    MyResourceInfo resourceInfo = new MyResourceInfo();
+                    resourceInfo.parts.Add(new PartResourceMap(part, resource));
+
+                    resources[resource.resourceName] = resourceInfo;
+                }
+            }
+        }
+
+        numberParts = vessel.parts.Count;
+        mainWindow.SetSize(10, 10);
     }
 
     public void CleanUp()
@@ -485,6 +503,12 @@ public class TacFuelBalancer : PartModule
         public PartResource resource;
         public TransferDirection direction = TransferDirection.NONE;
         public bool isSelected = false;
+
+        public PartResourceMap(Part part, PartResource resource)
+        {
+            this.part = part;
+            this.resource = resource;
+        }
     }
 
     private class MyResourceInfo
