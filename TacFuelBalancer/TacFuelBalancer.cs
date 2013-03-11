@@ -30,13 +30,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 using UnityEngine;
 
 public class TacFuelBalancer : PartModule
 {
     private MainWindow mainWindow;
-    private Dictionary<string, MyResourceInfo> resources;
+    private Dictionary<string, ResourceInfo> resources;
     private int numberParts;
     private string filename;
     private double lastUpdate;
@@ -50,7 +50,7 @@ public class TacFuelBalancer : PartModule
 
         mainWindow = new MainWindow(this);
 
-        resources = new Dictionary<string, MyResourceInfo>();
+        resources = new Dictionary<string, ResourceInfo>();
         numberParts = 0;
 
         filename = IOUtils.GetFilePathFor(this.GetType(), "TacFuelBalancer.cfg");
@@ -174,7 +174,7 @@ public class TacFuelBalancer : PartModule
                             }
                             else
                             {
-                                MyResourceInfo resourceInfo = new MyResourceInfo();
+                                ResourceInfo resourceInfo = new ResourceInfo();
                                 resourceInfo.parts.Add(partInfo);
 
                                 resources[resource.resourceName] = resourceInfo;
@@ -184,55 +184,10 @@ public class TacFuelBalancer : PartModule
                 }
 
                 // Do any fuel transfers
-                foreach (MyResourceInfo resourceInfo in resources.Values)
+                foreach (ResourceInfo resourceInfo in resources.Values)
                 {
-                    if (resourceInfo.balance)
-                    {
-                        List<MyPair> pairs = new List<MyPair>();
-                        double totalMaxAmount = 0.0;
-                        double totalAmount = 0.0;
-
-                        foreach (PartResourceMap partInfo in resourceInfo.parts)
-                        {
-                            totalMaxAmount += partInfo.resource.maxAmount;
-                            totalAmount += partInfo.resource.amount;
-                            double percentFull = partInfo.resource.amount / partInfo.resource.maxAmount;
-
-                            pairs.Add(new MyPair(percentFull, partInfo));
-                        }
-
-                        double totalPercentFull = totalAmount / totalMaxAmount;
-
-                        // First give to all parts with too little
-                        double amountLeftToMove = 0.0;
-                        foreach (MyPair pair in pairs)
-                        {
-                            if (pair.percentFull < totalPercentFull)
-                            {
-                                double adjustmentAmount = (pair.partInfo.resource.maxAmount * totalPercentFull) - pair.partInfo.resource.amount;
-                                double amountToGive = Math.Min(maxFuelFlow * deltaTime, adjustmentAmount);
-                                pair.partInfo.resource.amount += amountToGive;
-                                amountLeftToMove += amountToGive;
-                            }
-                        }
-
-                        // Second take from all parts with too much
-                        while (amountLeftToMove > 0.000001)
-                        {
-                            foreach (MyPair pair in pairs)
-                            {
-                                if (pair.percentFull > totalPercentFull)
-                                {
-                                    double adjustmentAmount = (pair.partInfo.resource.maxAmount * totalPercentFull) - pair.partInfo.resource.amount;
-                                    double amountToTake = Math.Min(Math.Min(maxFuelFlow * deltaTime / pairs.Count, -adjustmentAmount), amountLeftToMove);
-                                    pair.partInfo.resource.amount -= amountToTake;
-                                    amountLeftToMove -= amountToTake;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
+//                    else
+//                    {
                         foreach (PartResourceMap partInfo in resourceInfo.parts)
                         {
                             if (partInfo.direction == TransferDirection.IN)
@@ -240,13 +195,12 @@ public class TacFuelBalancer : PartModule
                                 partInfo.part.SetHighlightColor(Color.red);
                                 partInfo.part.SetHighlight(true);
 
-                                int count = resourceInfo.parts.Count - 1;
+								var parts = resourceInfo.parts.FindAll(pi => pi.direction != TransferDirection.IN);
                                 double available = Math.Min(maxFuelFlow * deltaTime, partInfo.resource.maxAmount - partInfo.resource.amount);
-                                double takeFromEach = available / count;
-
+                                double takeFromEach = available / parts.Count;
                                 double totalTaken = 0.0;
 
-                                foreach (PartResourceMap otherPartInfo in resourceInfo.parts)
+                                foreach (PartResourceMap otherPartInfo in parts)
                                 {
                                     if (partInfo.part != otherPartInfo.part)
                                     {
@@ -263,14 +217,13 @@ public class TacFuelBalancer : PartModule
                             {
                                 partInfo.part.SetHighlightColor(Color.blue);
                                 partInfo.part.SetHighlight(true);
-
-                                int count = resourceInfo.parts.Count - 1;
+                                
+								var parts = resourceInfo.parts.FindAll(pi => pi.direction != TransferDirection.OUT);
                                 double available = Math.Min(maxFuelFlow * deltaTime, partInfo.resource.amount);
-                                double giveToEach = available / count;
-
+                                double giveToEach = available / parts.Count;
                                 double totalGiven = 0.0;
 
-                                foreach (PartResourceMap otherPartInfo in resourceInfo.parts)
+                                foreach (PartResourceMap otherPartInfo in parts)
                                 {
                                     if (partInfo.part != otherPartInfo.part)
                                     {
@@ -283,12 +236,37 @@ public class TacFuelBalancer : PartModule
 
                                 partInfo.resource.amount -= totalGiven;
                             }
-                            else if (partInfo.isSelected)
+                            
+                            if (partInfo.isSelected && partInfo.part.highlightColor != Color.yellow)
                             {
                                 partInfo.part.SetHighlightColor(Color.yellow);
                                 partInfo.part.SetHighlight(true);
                             }
                         }
+//                    }
+					if (resourceInfo.balance || resourceInfo.parts.Count(pi => pi.direction != TransferDirection.NONE) >= 0)
+                    {
+						var ins = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.IN);
+						var outs = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.OUT);
+						
+						if (resourceInfo.balance) {
+							var selected = resourceInfo.parts.FindAll(pi => pi.isSelected);
+							if (selected.Count > 0) {
+								BalanceResources(deltaTime, selected);
+							}
+							else {
+								BalanceResources(deltaTime, resourceInfo.parts);
+							}
+						}
+						
+						if (outs.Count > 0) {
+							BalanceResources(deltaTime, outs);
+						}
+						
+						if (ins.Count > 0) {
+							BalanceResources(deltaTime, ins);
+//							BalanceResources(deltaTime, resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.NONE));
+						}
                     }
                 }
             }
@@ -298,7 +276,53 @@ public class TacFuelBalancer : PartModule
             Debug.LogWarning("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: error in OnUpdate");
         }
     }
+        
+    private void BalanceResources(double deltaTime, List<PartResourceMap> balanceParts)
+    {
+        List<MyPair> pairs = new List<MyPair>();
+        double totalMaxAmount = 0.0;
+        double totalAmount = 0.0;
+        
+        foreach (PartResourceMap partInfo in balanceParts)
+        {
+            totalMaxAmount += partInfo.resource.maxAmount;
+            totalAmount += partInfo.resource.amount;
+            double percentFull = partInfo.resource.amount / partInfo.resource.maxAmount;
 
+            pairs.Add(new MyPair(percentFull, partInfo));
+        }
+
+        double totalPercentFull = totalAmount / totalMaxAmount;
+
+        // First give to all parts with too little
+        double amountLeftToMove = 0.0;
+        foreach (MyPair pair in pairs)
+        {
+            if (pair.percentFull < totalPercentFull)
+            {
+                double adjustmentAmount = (pair.partInfo.resource.maxAmount * totalPercentFull) - pair.partInfo.resource.amount;
+                double amountToGive = Math.Min(maxFuelFlow * deltaTime, adjustmentAmount);
+                pair.partInfo.resource.amount += amountToGive;
+                amountLeftToMove += amountToGive;
+            }
+        }
+
+        // Second take from all parts with too much
+        while (amountLeftToMove > 0.000001)
+        {
+            foreach (MyPair pair in pairs)
+            {
+                if (pair.percentFull > totalPercentFull)
+                {
+                    double adjustmentAmount = (pair.partInfo.resource.maxAmount * totalPercentFull) - pair.partInfo.resource.amount;
+                    double amountToTake = Math.Min(Math.Min(maxFuelFlow * deltaTime / pairs.Count, -adjustmentAmount), amountLeftToMove);
+                    pair.partInfo.resource.amount -= amountToTake;
+                    amountLeftToMove -= amountToTake;
+                }
+            }
+        }
+    }
+        
     public void CleanUp()
     {
         if (debug)
@@ -315,7 +339,7 @@ public class TacFuelBalancer : PartModule
         mainWindow.SetVisible(true);
     }
 
-    [KSPEvent(guiActive = true, guiName = "Hide Fuel Balancer", active = true)]
+    [KSPEvent(guiActive = true, guiName = "Hide Fuel Balancer", active = false)]
     public void HideFuelBalancerWindow()
     {
         mainWindow.SetVisible(false);
@@ -372,9 +396,9 @@ public class TacFuelBalancer : PartModule
             GUILayout.BeginVertical();
 
             GUILayout.BeginHorizontal();
-            foreach (KeyValuePair<string, MyResourceInfo> pair in parent.resources)
+            foreach (KeyValuePair<string, ResourceInfo> pair in parent.resources)
             {
-                MyResourceInfo value = pair.Value;
+                ResourceInfo value = pair.Value;
                 value.isShowing = GUILayout.Toggle(value.isShowing, pair.Key, buttonStyle2);
             }
             GUILayout.FlexibleSpace();
@@ -384,9 +408,9 @@ public class TacFuelBalancer : PartModule
             }
             GUILayout.EndHorizontal();
 
-            foreach (KeyValuePair<string, MyResourceInfo> pair in parent.resources)
+            foreach (KeyValuePair<string, ResourceInfo> pair in parent.resources)
             {
-                MyResourceInfo resourceInfo = pair.Value;
+                ResourceInfo resourceInfo = pair.Value;
                 if (resourceInfo.isShowing)
                 {
                     resourceInfo.balance = GUILayout.Toggle(resourceInfo.balance, "Balance " + pair.Key, buttonStyle2);
@@ -458,7 +482,7 @@ public class TacFuelBalancer : PartModule
         public bool isSelected = false;
     }
 
-    private class MyResourceInfo
+    private class ResourceInfo
     {
         public List<PartResourceMap> parts = new List<PartResourceMap>();
         public bool balance = false;
