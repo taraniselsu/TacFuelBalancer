@@ -45,7 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\TacAtomicClock\TacAtomicClock\TacAtomicClock\Window.cs">
+    <Compile Include="..\..\TacLib\Window.cs">
       <Link>Window.cs</Link>
     </Compile>
     <Compile Include="TacFuelBalancer.cs" />
