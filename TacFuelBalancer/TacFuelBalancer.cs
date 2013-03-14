@@ -174,12 +174,12 @@ public class TacFuelBalancer : PartModule
                 // Do any fuel transfers
                 foreach (ResourceInfo resourceInfo in resources.Values)
                 {
-                    if (resourceInfo.balance)
-                    {
-                        balanceResources(deltaTime, resourceInfo.parts);
-                    }
-                    else
-                    {
+//                    if (resourceInfo.balance)
+//                    {
+//                        balanceResources(deltaTime, resourceInfo.parts);
+//                    }
+//                    else
+//                    {
                         foreach (ResourcePartMap partInfo in resourceInfo.parts)
                         {
                             if (partInfo.direction == TransferDirection.IN)
@@ -235,6 +235,30 @@ public class TacFuelBalancer : PartModule
                                 partInfo.part.SetHighlight(true);
                             }
                         }
+//                    }
+					if (resourceInfo.balance || resourceInfo.parts.Count(pi => pi.direction != TransferDirection.NONE) >= 0)
+                    {
+						var ins = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.IN);
+						var outs = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.OUT);
+						
+						if (resourceInfo.balance) {
+							var selected = resourceInfo.parts.FindAll(pi => pi.isSelected);
+							if (selected.Count > 0) {
+								balanceResources(deltaTime, selected);
+							}
+							else {
+								balanceResources(deltaTime, resourceInfo.parts);
+							}
+						}
+						
+						if (outs.Count > 0) {
+							balanceResources(deltaTime, outs);
+						}
+						
+						if (ins.Count > 0) {
+							balanceResources(deltaTime, ins);
+//							balanceResources(deltaTime, resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.NONE));
+						}
                     }
                 }
             }
