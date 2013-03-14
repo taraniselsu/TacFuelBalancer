@@ -454,7 +454,7 @@ public class TacFuelBalancer : PartModule
                         partInfo.isSelected = GUILayout.Toggle(partInfo.isSelected, "S", buttonStyle2);
                         GUILayout.Label(part.partInfo.title, labelStyle);
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label(part.inverseStage.ToString("00"), labelStyle);
+                        GUILayout.Label(part.inverseStage.ToString("#0"), labelStyle);
                         GUILayout.Label(resource.maxAmount.ToString("#,##0.0"), labelStyle);
                         GUILayout.Label(resource.amount.ToString("#,##0.0"), labelStyle);
                         GUILayout.Label(percentFull.ToString("##0.0") + "%", labelStyle);
