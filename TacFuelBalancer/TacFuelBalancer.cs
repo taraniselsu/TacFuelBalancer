@@ -36,6 +36,7 @@ public class TacFuelBalancer : PartModule
 {
     private MainWindow mainWindow;
     private ConfigWindow configWindow;
+    private HelpWindow helpWindow;
     private Dictionary<string, ResourceInfo> resources;
     private int numberParts;
     private string filename;
@@ -52,6 +53,7 @@ public class TacFuelBalancer : PartModule
 
         mainWindow = new MainWindow(this);
         configWindow = new ConfigWindow(this);
+        helpWindow = new HelpWindow(this);
 
         resources = new Dictionary<string, ResourceInfo>();
         numberParts = 0;
@@ -80,6 +82,7 @@ public class TacFuelBalancer : PartModule
                 config = ConfigNode.Load(filename);
                 mainWindow.Load(config, "mainWindow");
                 configWindow.Load(config, "configWindow");
+                helpWindow.Load(config, "helpWindow");
 
                 double newDoubleValue;
                 if (config.HasValue("maxFuelFlow") && double.TryParse(config.GetValue("maxFuelFlow"), out newDoubleValue))
@@ -127,6 +130,7 @@ public class TacFuelBalancer : PartModule
 
             mainWindow.Save(config, "mainWindow");
             configWindow.Save(config, "configWindow");
+            helpWindow.Save(config, "helpWindow");
 
             config.AddValue("maxFuelFlow", maxFuelFlow);
             config.AddValue("fuelWarningLevel", fuelWarningLevel);
@@ -359,6 +363,7 @@ public class TacFuelBalancer : PartModule
 
         mainWindow.SetVisible(false);
         configWindow.SetVisible(false);
+        helpWindow.SetVisible(false);
     }
 
     [KSPEvent(guiActive = true, guiName = "Show Fuel Balancer", active = true)]
@@ -403,6 +408,7 @@ public class TacFuelBalancer : PartModule
                 parent.Events["ShowFuelBalancerWindow"].active = true;
                 parent.Events["HideFuelBalancerWindow"].active = false;
                 parent.configWindow.SetVisible(false);
+                parent.helpWindow.SetVisible(false);
             }
         }
 
@@ -439,6 +445,7 @@ public class TacFuelBalancer : PartModule
             }
             if (GUILayout.Button("?", buttonStyle))
             {
+                parent.helpWindow.SetVisible(!parent.helpWindow.IsVisible());
             }
             if (GUILayout.Button("X", buttonStyle))
             {
@@ -591,6 +598,60 @@ public class TacFuelBalancer : PartModule
             GUILayout.EndHorizontal();
 
             parent.debug = GUILayout.Toggle(parent.debug, "Debug");
+
+            GUILayout.EndVertical();
+
+            GUI.DragWindow();
+        }
+    }
+
+    private class HelpWindow : Window
+    {
+        private TacFuelBalancer parent;
+
+        public HelpWindow(TacFuelBalancer parent)
+            : base("TAC Fuel Balancer Help", parent)
+        {
+            this.parent = parent;
+        }
+
+        protected override void Draw(int windowID)
+        {
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.padding = new RectOffset(5, 5, 3, 0);
+            buttonStyle.margin = new RectOffset(1, 1, 1, 1);
+            buttonStyle.stretchWidth = false;
+            buttonStyle.stretchHeight = false;
+
+            GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+            labelStyle.wordWrap = true;
+            labelStyle.fontStyle = FontStyle.Normal;
+            labelStyle.normal.textColor = Color.white;
+
+            GUIStyle textAreaStyle = new GUIStyle(GUI.skin.textArea);
+            textAreaStyle.fontStyle = FontStyle.Normal;
+            textAreaStyle.normal.textColor = Color.white;
+
+            GUILayout.BeginVertical(GUILayout.MinWidth(360));
+
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("X", buttonStyle))
+            {
+                SetVisible(false);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label("Fuel Balancer by Taranis Elsu of Thunder Aerospace Corporation.", labelStyle);
+            GUILayout.Label("Copyright (c) Thunder Aerospace Corporation. Patents pending.", labelStyle);
+            GUILayout.Space(20);
+            GUILayout.Label("Features", labelStyle);
+            GUILayout.Label("* Transfer a resource into a part, drawing an equal amount from each other part.", labelStyle);
+            GUILayout.Label("* Transfer a resource out of a part, tranferring an equal amount into each other part.", labelStyle);
+            GUILayout.Label("* Enable balance mode to transfer a resource such that all parts are the same percentage full.", labelStyle);
+            GUILayout.Label("* Lock a part, so that none of the resource will be transferred into or out of the part. This does not prevent other systems, like engines, from drawing resources from the part. It only disallows this system from transferring the resource.", labelStyle);
+            GUILayout.Space(20);
+            GUILayout.Label("Note that it can transfer any resource that uses the \"pump\" resource transfer mode, including liquid fuel, oxidizer, electric charge, and RCS fuel; but not resources such as solid rocket fuel.", labelStyle);
 
             GUILayout.EndVertical();
 
