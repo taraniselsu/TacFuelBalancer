@@ -35,6 +35,7 @@ using UnityEngine;
 public class TacFuelBalancer : PartModule
 {
     private MainWindow mainWindow;
+    private ConfigWindow configWindow;
     private Dictionary<string, ResourceInfo> resources;
     private int numberParts;
     private string filename;
@@ -50,6 +51,7 @@ public class TacFuelBalancer : PartModule
         Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnAwake");
 
         mainWindow = new MainWindow(this);
+        configWindow = new ConfigWindow(this);
 
         resources = new Dictionary<string, ResourceInfo>();
         numberParts = 0;
@@ -77,6 +79,7 @@ public class TacFuelBalancer : PartModule
             {
                 config = ConfigNode.Load(filename);
                 mainWindow.Load(config, "mainWindow");
+                configWindow.Load(config, "configWindow");
 
                 double newDoubleValue;
                 if (config.HasValue("maxFuelFlow") && double.TryParse(config.GetValue("maxFuelFlow"), out newDoubleValue))
@@ -123,6 +126,8 @@ public class TacFuelBalancer : PartModule
             ConfigNode config = new ConfigNode();
 
             mainWindow.Save(config, "mainWindow");
+            configWindow.Save(config, "configWindow");
+
             config.AddValue("maxFuelFlow", maxFuelFlow);
             config.AddValue("fuelWarningLevel", fuelWarningLevel);
             config.AddValue("fuelCriticalLevel", fuelCriticalLevel);
@@ -350,6 +355,7 @@ public class TacFuelBalancer : PartModule
         }
 
         mainWindow.SetVisible(false);
+        configWindow.SetVisible(false);
     }
 
     [KSPEvent(guiActive = true, guiName = "Show Fuel Balancer", active = true)]
@@ -393,6 +399,7 @@ public class TacFuelBalancer : PartModule
             {
                 parent.Events["ShowFuelBalancerWindow"].active = true;
                 parent.Events["HideFuelBalancerWindow"].active = false;
+                parent.configWindow.SetVisible(false);
             }
         }
 
@@ -425,6 +432,7 @@ public class TacFuelBalancer : PartModule
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("C", buttonStyle))
             {
+                parent.configWindow.SetVisible(!parent.configWindow.IsVisible());
             }
             if (GUILayout.Button("?", buttonStyle))
             {
@@ -512,6 +520,78 @@ public class TacFuelBalancer : PartModule
             {
                 SetSize(10, 10);
             }
+        }
+    }
+
+    private class ConfigWindow : Window
+    {
+        private TacFuelBalancer parent;
+
+        public ConfigWindow(TacFuelBalancer parent)
+            : base("TAC Fuel Balancer Config", parent)
+        {
+            this.parent = parent;
+        }
+
+        protected override void Draw(int windowID)
+        {
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.padding = new RectOffset(5, 5, 3, 0);
+            buttonStyle.margin = new RectOffset(1, 1, 1, 1);
+            buttonStyle.stretchWidth = false;
+            buttonStyle.stretchHeight = false;
+
+            GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+            labelStyle.wordWrap = false;
+            labelStyle.fontStyle = FontStyle.Normal;
+            labelStyle.normal.textColor = Color.white;
+
+            GUILayout.BeginVertical();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("X", buttonStyle))
+            {
+                SetVisible(false);
+            }
+            GUILayout.EndHorizontal();
+
+            double temp;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Maximum Fuel Flow Rate", labelStyle, GUILayout.ExpandWidth(true));
+            GUILayout.FlexibleSpace();
+            string fieldValue = GUILayout.TextField(parent.maxFuelFlow.ToString(), 10, GUILayout.MinWidth(50));
+            if (double.TryParse(fieldValue, out temp))
+            {
+                parent.maxFuelFlow = temp;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Fuel Warning Level", labelStyle, GUILayout.ExpandWidth(true));
+            GUILayout.FlexibleSpace();
+            fieldValue = GUILayout.TextField(parent.fuelWarningLevel.ToString(), 10, GUILayout.MinWidth(50));
+            if (double.TryParse(fieldValue, out temp))
+            {
+                parent.fuelWarningLevel = temp;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Fuel Critical Level", labelStyle, GUILayout.ExpandWidth(true));
+            GUILayout.FlexibleSpace();
+            fieldValue = GUILayout.TextField(parent.fuelCriticalLevel.ToString(), 10, GUILayout.MinWidth(50));
+            if (double.TryParse(fieldValue, out temp))
+            {
+                parent.fuelCriticalLevel = temp;
+            }
+            GUILayout.EndHorizontal();
+
+            parent.debug = GUILayout.Toggle(parent.debug, "Debug");
+
+            GUILayout.EndVertical();
+
+            GUI.DragWindow();
         }
     }
 
