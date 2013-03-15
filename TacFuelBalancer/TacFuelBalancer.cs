@@ -168,7 +168,7 @@ public class TacFuelBalancer : PartModule
 
                 if (numberParts != vessel.parts.Count)
                 {
-                    rebuildLists();
+                    RebuildLists();
                 }
 
                 // Do any fuel transfers
@@ -176,7 +176,7 @@ public class TacFuelBalancer : PartModule
                 {
                     if (resourceInfo.balance)
                     {
-                        balanceResources(deltaTime, resourceInfo.parts);
+                        BalanceResources(deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction != TransferDirection.LOCKED));
                     }
                     else
                     {
@@ -184,10 +184,7 @@ public class TacFuelBalancer : PartModule
                         {
                             if (partInfo.direction == TransferDirection.IN)
                             {
-                                partInfo.part.SetHighlightColor(Color.red);
-                                partInfo.part.SetHighlight(true);
-
-                                var otherParts = resourceInfo.parts.FindAll(rpm => (rpm.direction != TransferDirection.IN) && (rpm.resource.amount > 0));
+                                var otherParts = resourceInfo.parts.FindAll(rpm => (rpm.direction != TransferDirection.IN) && (rpm.direction != TransferDirection.LOCKED) && (rpm.resource.amount > 0));
                                 double available = Math.Min(maxFuelFlow * deltaTime, partInfo.resource.maxAmount - partInfo.resource.amount);
                                 double takeFromEach = available / otherParts.Count;
                                 double totalTaken = 0.0;
@@ -207,10 +204,7 @@ public class TacFuelBalancer : PartModule
                             }
                             else if (partInfo.direction == TransferDirection.OUT)
                             {
-                                partInfo.part.SetHighlightColor(Color.blue);
-                                partInfo.part.SetHighlight(true);
-
-                                var otherParts = resourceInfo.parts.FindAll(rpm => (rpm.direction != TransferDirection.OUT) && ((rpm.resource.maxAmount - rpm.resource.amount) > 0));
+                                var otherParts = resourceInfo.parts.FindAll(rpm => (rpm.direction != TransferDirection.OUT) && (rpm.direction != TransferDirection.LOCKED) && ((rpm.resource.maxAmount - rpm.resource.amount) > 0));
                                 double available = Math.Min(maxFuelFlow * deltaTime, partInfo.resource.amount);
                                 double giveToEach = available / otherParts.Count;
                                 double totalGiven = 0.0;
@@ -231,7 +225,7 @@ public class TacFuelBalancer : PartModule
 
                             if (partInfo.isSelected)
                             {
-                                partInfo.part.SetHighlightColor(Color.yellow);
+                                partInfo.part.SetHighlightColor(Color.blue);
                                 partInfo.part.SetHighlight(true);
                             }
                         }
@@ -245,7 +239,7 @@ public class TacFuelBalancer : PartModule
         }
     }
 
-    private void balanceResources(double deltaTime, List<ResourcePartMap> balanceParts)
+    private void BalanceResources(double deltaTime, List<ResourcePartMap> balanceParts)
     {
         List<PartPercentFull> pairs = new List<PartPercentFull>();
         double totalMaxAmount = 0.0;
@@ -291,7 +285,7 @@ public class TacFuelBalancer : PartModule
         }
     }
 
-    private void rebuildLists()
+    private void RebuildLists()
     {
         List<string> toDelete = new List<string>();
         foreach (KeyValuePair<string, ResourceInfo> resourceEntry in resources)
@@ -406,7 +400,8 @@ public class TacFuelBalancer : PartModule
 
             GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
             labelStyle.wordWrap = false;
-            labelStyle.margin.right += 3;
+            labelStyle.margin.top += 2;
+            labelStyle.margin.right += 4;
             labelStyle.fontStyle = FontStyle.Normal;
 
             GUILayout.BeginVertical();
@@ -418,6 +413,12 @@ public class TacFuelBalancer : PartModule
                 value.isShowing = GUILayout.Toggle(value.isShowing, pair.Key, buttonStyle2);
             }
             GUILayout.FlexibleSpace();
+            if (GUILayout.Button("C", buttonStyle))
+            {
+            }
+            if (GUILayout.Button("?", buttonStyle))
+            {
+            }
             if (GUILayout.Button("X", buttonStyle))
             {
                 SetVisible(false);
@@ -439,7 +440,7 @@ public class TacFuelBalancer : PartModule
 
                         if (percentFull < parent.fuelCriticalLevel)
                         {
-                            labelStyle.normal.textColor = Color.red;
+                            labelStyle.normal.textColor = new Color(0.88f, 0.20f, 0.20f, 1.0f);
                         }
                         else if (percentFull < parent.fuelWarningLevel)
                         {
@@ -451,36 +452,44 @@ public class TacFuelBalancer : PartModule
                         }
 
                         GUILayout.BeginHorizontal();
-                        partInfo.isSelected = GUILayout.Toggle(partInfo.isSelected, "S", buttonStyle2);
-                        GUILayout.Label(part.partInfo.title, labelStyle);
+                        partInfo.isSelected = GUILayout.Toggle(partInfo.isSelected, part.partInfo.title, buttonStyle2);
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label(part.inverseStage.ToString("00"), labelStyle);
+                        GUILayout.Label(part.inverseStage.ToString("#0"), labelStyle);
                         GUILayout.Label(resource.maxAmount.ToString("#,##0.0"), labelStyle);
                         GUILayout.Label(resource.amount.ToString("#,##0.0"), labelStyle);
                         GUILayout.Label(percentFull.ToString("##0.0") + "%", labelStyle);
+                        bool locked = GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", buttonStyle2);
 
+                        bool transferIn = false;
+                        bool transferOut = false;
                         if (!resourceInfo.balance)
                         {
-                            bool transferIn = GUILayout.Toggle((partInfo.direction == TransferDirection.IN), "In", buttonStyle2);
-                            bool transferOut = GUILayout.Toggle((partInfo.direction == TransferDirection.OUT), "Out", buttonStyle2);
-
-                            if (GUI.changed)
-                            {
-                                if (transferIn)
-                                {
-                                    partInfo.direction = TransferDirection.IN;
-                                }
-                                else if (transferOut)
-                                {
-                                    partInfo.direction = TransferDirection.OUT;
-                                }
-                                else
-                                {
-                                    partInfo.direction = TransferDirection.NONE;
-                                    part.SetHighlightDefault();
-                                }
-                            }
+                            transferIn = GUILayout.Toggle((partInfo.direction == TransferDirection.IN), "In", buttonStyle2);
+                            transferOut = GUILayout.Toggle((partInfo.direction == TransferDirection.OUT), "Out", buttonStyle2);
                         }
+
+                        if (locked && partInfo.direction != TransferDirection.LOCKED)
+                        {
+                            partInfo.direction = TransferDirection.LOCKED;
+                        }
+                        else if (transferIn && partInfo.direction != TransferDirection.IN)
+                        {
+                            partInfo.direction = TransferDirection.IN;
+                        }
+                        else if (transferOut && partInfo.direction != TransferDirection.OUT)
+                        {
+                            partInfo.direction = TransferDirection.OUT;
+                        }
+                        else if (!locked && !transferIn && !transferOut && partInfo.direction != TransferDirection.NONE)
+                        {
+                            partInfo.direction = TransferDirection.NONE;
+                        }
+
+                        if (GUI.changed)
+                        {
+                            partInfo.part.SetHighlightDefault();
+                        }
+
                         GUILayout.EndHorizontal();
                     }
                 }
@@ -500,7 +509,8 @@ public class TacFuelBalancer : PartModule
     {
         NONE,
         IN,
-        OUT
+        OUT,
+        LOCKED
     }
 
     private class ResourcePartMap
