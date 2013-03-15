@@ -195,12 +195,15 @@ public class TacFuelBalancer : PartModule
                             {
                                 TransferOut(deltaTime, resourceInfo, partInfo);
                             }
+                        }
+                    }
 
-                            if (partInfo.isSelected)
-                            {
-                                partInfo.part.SetHighlightColor(Color.blue);
-                                partInfo.part.SetHighlight(true);
-                            }
+                    foreach (ResourcePartMap partInfo in resourceInfo.parts)
+                    {
+                        if (partInfo.isSelected)
+                        {
+                            partInfo.part.SetHighlightColor(Color.blue);
+                            partInfo.part.SetHighlight(true);
                         }
                     }
                 }
