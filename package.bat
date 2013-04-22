@@ -6,5 +6,9 @@ mkdir Release\%DIR%
 
 xcopy /s /f /y Parts Release\%DIR%\Parts\
 xcopy /s /f /y Plugins Release\%DIR%\Plugins\
+copy /y LICENSE.txt Release\%DIR%\
+copy /y Readme.txt Release\%DIR%\
 
-7z a -tzip Release\%DIR%.zip Release\%DIR%
+cd Release
+7z a -tzip %DIR%.zip %DIR%
+cd ..
