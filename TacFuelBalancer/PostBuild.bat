@@ -1,2 +1,3 @@
-rem copy TacFuelBalancer.dll F:\KSP_win-0.19.0\Plugins\
-copy TacFuelBalancer.dll %1..\Plugins\
+set DIR=%1..\Plugins\
+if not exist %DIR% mkdir %DIR%
+copy TacFuelBalancer.dll %DIR%
