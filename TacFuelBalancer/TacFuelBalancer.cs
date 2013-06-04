@@ -200,7 +200,7 @@ public class TacFuelBalancer : PartModule
                                 TransferOut(deltaTime, resourceInfo, partInfo);
                             }
                         }
-                    }
+//                    }
 
                     foreach (ResourcePartMap partInfo in resourceInfo.parts)
                     {
@@ -209,29 +209,30 @@ public class TacFuelBalancer : PartModule
                             partInfo.part.SetHighlightColor(Color.blue);
                             partInfo.part.SetHighlight(true);
                         }
-//                    }
+                    }
+                    
 					if (resourceInfo.balance || resourceInfo.parts.Count(pi => pi.direction != TransferDirection.NONE) >= 0)
                     {
-						var ins = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.IN);
+						var ins  = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.IN);
 						var outs = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.OUT);
 						
 						if (resourceInfo.balance) {
 							var selected = resourceInfo.parts.FindAll(pi => pi.isSelected);
 							if (selected.Count > 0) {
-								balanceResources(deltaTime, selected);
+								BalanceResources(deltaTime, selected);
 							}
 							else {
-								balanceResources(deltaTime, resourceInfo.parts);
+								BalanceResources(deltaTime, resourceInfo.parts);
 							}
 						}
 						
 						if (outs.Count > 0) {
-							balanceResources(deltaTime, outs);
+							BalanceResources(deltaTime, outs);
 						}
 						
 						if (ins.Count > 0) {
-							balanceResources(deltaTime, ins);
-//							balanceResources(deltaTime, resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.NONE));
+							BalanceResources(deltaTime, ins);
+//							BalanceResources(deltaTime, resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.NONE));
 						}
                     }
                 }
