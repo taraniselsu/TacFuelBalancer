@@ -18,8 +18,8 @@ namespace Tac
             Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: Awake");
             configFilename = IOUtils.GetFilePathFor(this.GetType(), "FuelBalancer.cfg");
 
-            icon = new Icon<NewFuelBalancer>(new Rect(Screen.width * 0.2f, 0, 32, 32),
-                IOUtils.GetFilePathFor(this.GetType(), "icon.png"), "Click to show the Fuel Balancer", OnIconClicked);
+            icon = new Icon<NewFuelBalancer>(new Rect(Screen.width * 0.2f, 0, 32, 32), "icon.png",
+                "Click to show the Fuel Balancer", OnIconClicked);
         }
 
         void Start()
