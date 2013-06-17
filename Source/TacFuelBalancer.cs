@@ -389,7 +389,7 @@ public class TacFuelBalancer : PartModule
         private TacFuelBalancer parent;
 
         public MainWindow(TacFuelBalancer parent)
-            : base("TAC Fuel Balancer", parent)
+            : base("TAC Fuel Balancer")
         {
             this.parent = parent;
         }
@@ -538,7 +538,7 @@ public class TacFuelBalancer : PartModule
         private TacFuelBalancer parent;
 
         public ConfigWindow(TacFuelBalancer parent)
-            : base("TAC Fuel Balancer Config", parent)
+            : base("TAC Fuel Balancer Config")
         {
             this.parent = parent;
         }
@@ -610,7 +610,7 @@ public class TacFuelBalancer : PartModule
         private TacFuelBalancer parent;
 
         public HelpWindow(TacFuelBalancer parent)
-            : base("TAC Fuel Balancer Help", parent)
+            : base("TAC Fuel Balancer Help")
         {
             this.parent = parent;
         }

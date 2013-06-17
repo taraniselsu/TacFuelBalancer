@@ -54,7 +54,7 @@
     <Compile Include="..\..\TacLib\Source\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
-    <Compile Include="..\..\TacLib\Window.cs">
+    <Compile Include="..\..\TacLib\Source\Window.cs">
       <Link>Window.cs</Link>
     </Compile>
     <Compile Include="NewFuelBalancer.cs" />
