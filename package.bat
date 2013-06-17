@@ -4,10 +4,9 @@ set DIR=TacFuelBalancer_v%1
 
 mkdir Release\%DIR%
 
-xcopy /s /f /y Parts Release\%DIR%\Parts\
-xcopy /s /f /y Plugins Release\%DIR%\Plugins\
-copy /y LICENSE.txt Release\%DIR%\
-copy /y Readme.txt Release\%DIR%\
+xcopy /s /f /y GameData Release\%DIR%\GameData\
+copy /y LICENSE.txt Release\%DIR%\GameData\TacFuelBalancer\
+copy /y Readme.txt Release\%DIR%\GameData\TacFuelBalancer\
 
 cd Release
 7z a -tzip %DIR%.zip %DIR%
