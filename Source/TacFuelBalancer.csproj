@@ -48,9 +48,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\TacLib\Source\Icon.cs">
+      <Link>Icon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\TacLib\Source\Utilities.cs">
+      <Link>Utilities.cs</Link>
+    </Compile>
     <Compile Include="..\..\TacLib\Window.cs">
       <Link>Window.cs</Link>
     </Compile>
+    <Compile Include="NewFuelBalancer.cs" />
     <Compile Include="TacFuelBalancer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
