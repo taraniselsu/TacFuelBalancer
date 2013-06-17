@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Tac;
 
 public class TacFuelBalancer : PartModule
 {
@@ -80,9 +81,9 @@ public class TacFuelBalancer : PartModule
             if (File.Exists<TacFuelBalancer>(filename))
             {
                 config = ConfigNode.Load(filename);
-                mainWindow.Load(config, "mainWindow");
-                configWindow.Load(config, "configWindow");
-                helpWindow.Load(config, "helpWindow");
+                mainWindow.Load(config);
+                configWindow.Load(config);
+                helpWindow.Load(config);
 
                 double newDoubleValue;
                 if (config.HasValue("maxFuelFlow") && double.TryParse(config.GetValue("maxFuelFlow"), out newDoubleValue))
@@ -128,9 +129,9 @@ public class TacFuelBalancer : PartModule
         {
             ConfigNode config = new ConfigNode();
 
-            mainWindow.Save(config, "mainWindow");
-            configWindow.Save(config, "configWindow");
-            helpWindow.Save(config, "helpWindow");
+            mainWindow.Save(config);
+            configWindow.Save(config);
+            helpWindow.Save(config);
 
             config.AddValue("maxFuelFlow", maxFuelFlow);
             config.AddValue("fuelWarningLevel", fuelWarningLevel);
@@ -263,7 +264,6 @@ public class TacFuelBalancer : PartModule
         }
 
         numberParts = vessel.parts.Count;
-        mainWindow.SetSize(10, 10);
     }
 
     private void BalanceResources(double deltaTime, List<ResourcePartMap> balanceParts)
@@ -384,7 +384,7 @@ public class TacFuelBalancer : PartModule
         mainWindow.SetVisible(!mainWindow.IsVisible());
     }
 
-    private class MainWindow : Window
+    private class MainWindow : Window<TacFuelBalancer>
     {
         private TacFuelBalancer parent;
 
@@ -412,7 +412,7 @@ public class TacFuelBalancer : PartModule
             }
         }
 
-        protected override void Draw(int windowID)
+        protected override void DrawWindowContents(int windowID)
         {
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
             buttonStyle.padding = new RectOffset(5, 5, 3, 0);
@@ -523,17 +523,10 @@ public class TacFuelBalancer : PartModule
                 }
             }
             GUILayout.EndVertical();
-
-            GUI.DragWindow();
-
-            if (GUI.changed)
-            {
-                SetSize(10, 10);
-            }
         }
     }
 
-    private class ConfigWindow : Window
+    private class ConfigWindow : Window<TacFuelBalancer>
     {
         private TacFuelBalancer parent;
 
@@ -543,7 +536,7 @@ public class TacFuelBalancer : PartModule
             this.parent = parent;
         }
 
-        protected override void Draw(int windowID)
+        protected override void DrawWindowContents(int windowID)
         {
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
             buttonStyle.padding = new RectOffset(5, 5, 3, 0);
@@ -600,12 +593,10 @@ public class TacFuelBalancer : PartModule
             parent.debug = GUILayout.Toggle(parent.debug, "Debug");
 
             GUILayout.EndVertical();
-
-            GUI.DragWindow();
         }
     }
 
-    private class HelpWindow : Window
+    private class HelpWindow : Window<TacFuelBalancer>
     {
         private TacFuelBalancer parent;
 
@@ -615,7 +606,7 @@ public class TacFuelBalancer : PartModule
             this.parent = parent;
         }
 
-        protected override void Draw(int windowID)
+        protected override void DrawWindowContents(int windowID)
         {
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
             buttonStyle.padding = new RectOffset(5, 5, 3, 0);
@@ -654,8 +645,6 @@ public class TacFuelBalancer : PartModule
             GUILayout.Label("Note that it can transfer any resource that uses the \"pump\" resource transfer mode, including liquid fuel, oxidizer, electric charge, and RCS fuel; but not resources such as solid rocket fuel.", labelStyle);
 
             GUILayout.EndVertical();
-
-            GUI.DragWindow();
         }
     }
 
