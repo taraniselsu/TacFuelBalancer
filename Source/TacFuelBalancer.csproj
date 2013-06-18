@@ -57,7 +57,12 @@
     <Compile Include="..\..\TacLib\Source\Window.cs">
       <Link>Window.cs</Link>
     </Compile>
+    <Compile Include="MainWindow.cs" />
+    <Compile Include="SettingsWindow.cs" />
+    <Compile Include="FuelBalanceController.cs" />
+    <Compile Include="HelpWindow.cs" />
     <Compile Include="NewFuelBalancer.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="TacFuelBalancer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
