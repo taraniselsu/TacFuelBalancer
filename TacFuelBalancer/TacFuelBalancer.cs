@@ -47,7 +47,6 @@ public class TacFuelBalancer : PartModule
     private bool balanceOUT;
     private bool balanceIN;
     private bool debug;
-    private bool lastMainWindow;
 
     public override void OnAwake()
     {
