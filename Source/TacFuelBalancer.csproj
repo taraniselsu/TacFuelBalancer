@@ -51,6 +51,9 @@
     <Compile Include="..\..\TacLib\Source\Icon.cs">
       <Link>Icon.cs</Link>
     </Compile>
+    <Compile Include="..\..\TacLib\Source\PopupWindow.cs">
+      <Link>PopupWindow.cs</Link>
+    </Compile>
     <Compile Include="..\..\TacLib\Source\Utilities.cs">
       <Link>Utilities.cs</Link>
     </Compile>
@@ -61,7 +64,6 @@
     <Compile Include="SettingsWindow.cs" />
     <Compile Include="FuelBalanceController.cs" />
     <Compile Include="HelpWindow.cs" />
-    <Compile Include="NewFuelBalancer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TacFuelBalancer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

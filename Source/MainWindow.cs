@@ -8,23 +8,32 @@ namespace Tac
 {
     class MainWindow : Window<TacFuelBalancer>
     {
-        private FuelBalanceController parent;
+        private FuelBalanceController controller;
         private Settings settings;
         private SettingsWindow settingsWindow;
         private HelpWindow helpWindow;
 
-        private GUIStyle buttonStyle;
-        private GUIStyle labelStyle;
-
+        private Vector2 headerScrollPosition;
         private Vector2 scrollPosition;
 
-        public MainWindow(FuelBalanceController parent, Settings settings, SettingsWindow settingsWindow, HelpWindow helpWindow)
+        private GUIStyle buttonStyle;
+        private GUIStyle labelStyle;
+        private GUIStyle sectionStyle;
+        private GUIStyle popupButtonStyle;
+        private GUIStyle editStyle;
+
+        private double newAmount;
+
+        public MainWindow(FuelBalanceController controller, Settings settings, SettingsWindow settingsWindow, HelpWindow helpWindow)
             : base("TAC Fuel Balancer")
         {
-            this.parent = parent;
+            this.controller = controller;
             this.settings = settings;
             this.settingsWindow = settingsWindow;
             this.helpWindow = helpWindow;
+
+            headerScrollPosition = Vector2.zero;
+            scrollPosition = Vector2.zero;
         }
 
         public override void SetVisible(bool newValue)
@@ -45,36 +54,63 @@ namespace Tac
             if (buttonStyle == null)
             {
                 buttonStyle = new GUIStyle(GUI.skin.button);
+                buttonStyle.alignment = TextAnchor.LowerCenter;
+                buttonStyle.fontStyle = FontStyle.Normal;
+                buttonStyle.padding.top = 3;
+                buttonStyle.padding.bottom = 1;
                 buttonStyle.stretchWidth = false;
                 buttonStyle.stretchHeight = false;
 
                 labelStyle = new GUIStyle(GUI.skin.label);
-                labelStyle.wordWrap = false;
-                labelStyle.margin.top += 2;
-                labelStyle.margin.right += 4;
+                labelStyle.alignment = TextAnchor.MiddleRight;
                 labelStyle.fontStyle = FontStyle.Normal;
+                labelStyle.wordWrap = false;
+
+                sectionStyle = new GUIStyle(GUI.skin.label);
+                sectionStyle.alignment = TextAnchor.LowerLeft;
+                sectionStyle.fontStyle = FontStyle.Bold;
+                sectionStyle.padding.top += 2;
+                sectionStyle.normal.textColor = Color.white;
+                sectionStyle.wordWrap = false;
+
+                popupButtonStyle = new GUIStyle(GUI.skin.button);
+                popupButtonStyle.alignment = TextAnchor.MiddleCenter;
+                popupButtonStyle.margin = new RectOffset(2, 2, 2, 2);
+                popupButtonStyle.padding = new RectOffset(3, 3, 3, 0);
+
+                editStyle = new GUIStyle(GUI.skin.textField);
+                editStyle.fontStyle = FontStyle.Normal;
             }
         }
 
         protected override void DrawWindowContents(int windowID)
         {
+            headerScrollPosition = GUILayout.BeginScrollView(headerScrollPosition, GUILayout.ExpandHeight(false));
             GUILayout.BeginHorizontal();
-            foreach (KeyValuePair<string, ResourceInfo> pair in parent.resources)
+            foreach (KeyValuePair<string, ResourceInfo> pair in controller.GetResourceInfo())
             {
                 ResourceInfo value = pair.Value;
                 value.isShowing = GUILayout.Toggle(value.isShowing, pair.Key, buttonStyle);
             }
             GUILayout.EndHorizontal();
+            GUILayout.EndScrollView();
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             GUILayout.BeginVertical();
-            
-            foreach (KeyValuePair<string, ResourceInfo> pair in parent.resources)
+
+            foreach (KeyValuePair<string, ResourceInfo> pair in controller.GetResourceInfo())
             {
                 ResourceInfo resourceInfo = pair.Value;
                 if (resourceInfo.isShowing)
                 {
-                    resourceInfo.balance = GUILayout.Toggle(resourceInfo.balance, "Balance " + pair.Key, buttonStyle);
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUILayout.Label(pair.Key, sectionStyle, GUILayout.Width(100));
+                    if (resourceInfo.parts[0].resource.info.resourceTransferMode == ResourceTransferMode.PUMP)
+                    {
+                        resourceInfo.balance = GUILayout.Toggle(resourceInfo.balance, "Balance All", buttonStyle);
+                    }
+                    GUILayout.EndHorizontal();
 
                     foreach (ResourcePartMap partInfo in resourceInfo.parts)
                     {
@@ -96,43 +132,25 @@ namespace Tac
                         }
 
                         GUILayout.BeginHorizontal();
-                        partInfo.isSelected = GUILayout.Toggle(partInfo.isSelected, part.partInfo.title, buttonStyle);
+                        GUILayout.Label(part.partInfo.title, labelStyle);
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label(part.inverseStage.ToString("#0"), labelStyle);
-                        GUILayout.Label(resource.maxAmount.ToString("#,##0.0"), labelStyle);
-                        GUILayout.Label(resource.amount.ToString("#,##0.0"), labelStyle);
-                        GUILayout.Label(percentFull.ToString("##0.0") + "%", labelStyle);
-                        bool locked = GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", buttonStyle);
-
-                        bool transferIn = false;
-                        bool transferOut = false;
-                        if (!resourceInfo.balance)
+                        if (settings.ShowStageNumber)
                         {
-                            transferIn = GUILayout.Toggle((partInfo.direction == TransferDirection.IN), "In", buttonStyle);
-                            transferOut = GUILayout.Toggle((partInfo.direction == TransferDirection.OUT), "Out", buttonStyle);
+                            GUILayout.Label(part.inverseStage.ToString("#0"), labelStyle, GUILayout.Width(20));
                         }
-
-                        if (locked && partInfo.direction != TransferDirection.LOCKED)
+                        if (settings.ShowMaxAmount)
                         {
-                            partInfo.direction = TransferDirection.LOCKED;
+                            GUILayout.Label(resource.maxAmount.ToString("#,##0.0"), labelStyle, GUILayout.Width(60));
                         }
-                        else if (transferIn && partInfo.direction != TransferDirection.IN)
+                        if (settings.ShowCurrentAmount)
                         {
-                            partInfo.direction = TransferDirection.IN;
+                            GUILayout.Label(resource.amount.ToString("#,##0.0"), labelStyle, GUILayout.Width(60));
                         }
-                        else if (transferOut && partInfo.direction != TransferDirection.OUT)
+                        if (settings.ShowPercentFull)
                         {
-                            partInfo.direction = TransferDirection.OUT;
+                            GUILayout.Label(percentFull.ToString("##0.0") + "%", labelStyle, GUILayout.Width(46));
                         }
-                        else if (!locked && !transferIn && !transferOut && partInfo.direction != TransferDirection.NONE)
-                        {
-                            partInfo.direction = TransferDirection.NONE;
-                        }
-
-                        if (GUI.changed)
-                        {
-                            partInfo.part.SetHighlightDefault();
-                        }
+                        PopupWindow.Draw(GetControlText(partInfo.direction), windowPos, DrawPopupContents, buttonStyle, partInfo, GUILayout.Width(20));
 
                         GUILayout.EndHorizontal();
                     }
@@ -142,7 +160,20 @@ namespace Tac
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
 
-            GUILayout.Space(8);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Toggle((settings.RateMultiplier == 10.0), "x10", buttonStyle))
+            {
+                settings.RateMultiplier = 10.0;
+            }
+            if (GUILayout.Toggle((settings.RateMultiplier == 1.0), "x1", buttonStyle))
+            {
+                settings.RateMultiplier = 1.0;
+            }
+            if (GUILayout.Toggle((settings.RateMultiplier == 0.1), "x0.1", buttonStyle))
+            {
+                settings.RateMultiplier = 0.1;
+            }
+            GUILayout.EndHorizontal();
 
             if (GUI.Button(new Rect(windowPos.width - 68, 4, 20, 20), "S", closeButtonStyle))
             {
@@ -152,6 +183,146 @@ namespace Tac
             {
                 helpWindow.SetVisible(true);
             }
+        }
+
+        private string GetControlText(TransferDirection direction)
+        {
+            switch (direction)
+            {
+                case TransferDirection.IN:
+                    return "I";
+                case TransferDirection.OUT:
+                    return "O";
+                case TransferDirection.BALANCE:
+                    return "B";
+                case TransferDirection.DUMP:
+                    return "D";
+                case TransferDirection.LOCKED:
+                    return "L";
+                default:
+                    return "-";
+            }
+        }
+
+        private bool DrawPopupContents(int windowId, object parameter)
+        {
+            ResourcePartMap partInfo = (ResourcePartMap)parameter;
+
+            partInfo.isSelected = GUILayout.Toggle(partInfo.isSelected, "Highlight", popupButtonStyle);
+            if (!partInfo.isSelected)
+            {
+                partInfo.part.SetHighlightDefault();
+            }
+
+            if (controller.IsPrelaunch())
+            {
+                newAmount = partInfo.resource.amount;
+                PopupWindow.Draw("Edit", windowPos, DrawEditPopupContents, popupButtonStyle, partInfo);
+            }
+
+            if (partInfo.resource.info.resourceTransferMode == ResourceTransferMode.PUMP)
+            {
+                if (GUILayout.Toggle((partInfo.direction == TransferDirection.IN), "Transfer In", popupButtonStyle))
+                {
+                    partInfo.direction = TransferDirection.IN;
+                }
+                else if (partInfo.direction == TransferDirection.IN)
+                {
+                    partInfo.direction = TransferDirection.NONE;
+                }
+
+                if (GUILayout.Toggle((partInfo.direction == TransferDirection.OUT), "Transfer Out", popupButtonStyle))
+                {
+                    partInfo.direction = TransferDirection.OUT;
+                }
+                else if (partInfo.direction == TransferDirection.OUT)
+                {
+                    partInfo.direction = TransferDirection.NONE;
+                }
+
+                if (GUILayout.Toggle((partInfo.direction == TransferDirection.BALANCE), "Balance", popupButtonStyle))
+                {
+                    partInfo.direction = TransferDirection.BALANCE;
+                }
+                else if (partInfo.direction == TransferDirection.BALANCE)
+                {
+                    partInfo.direction = TransferDirection.NONE;
+                }
+
+                if (GUILayout.Toggle((partInfo.direction == TransferDirection.DUMP), "Dump", popupButtonStyle))
+                {
+                    partInfo.direction = TransferDirection.DUMP;
+                }
+                else if (partInfo.direction == TransferDirection.DUMP)
+                {
+                    partInfo.direction = TransferDirection.NONE;
+                }
+
+                if (GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", popupButtonStyle))
+                {
+                    partInfo.direction = TransferDirection.LOCKED;
+                }
+                else if (partInfo.direction == TransferDirection.LOCKED)
+                {
+                    partInfo.direction = TransferDirection.NONE;
+                }
+            }
+
+            return false;
+        }
+
+        private bool DrawEditPopupContents(int windowId, object parameter)
+        {
+            ResourcePartMap partInfo = (ResourcePartMap)parameter;
+            bool shouldClose = false;
+
+            if (newAmount > partInfo.resource.maxAmount || newAmount < 0)
+            {
+                editStyle.normal.textColor = Color.red;
+                editStyle.focused.textColor = Color.red;
+                labelStyle.normal.textColor = Color.red;
+            }
+            else
+            {
+                editStyle.normal.textColor = Color.white;
+                editStyle.focused.textColor = Color.white;
+                labelStyle.normal.textColor = Color.white;
+            }
+
+            GUILayout.BeginVertical();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Empty", buttonStyle))
+            {
+                newAmount = 0;
+            }
+            if (GUILayout.Button("Fill", buttonStyle))
+            {
+                newAmount = partInfo.resource.maxAmount;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Enter new amount:", labelStyle);
+            newAmount = Utilities.ShowTextField(newAmount, 10, editStyle, GUILayout.MinWidth(60));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("OK", buttonStyle) && newAmount <= partInfo.resource.maxAmount && newAmount >= 0)
+            {
+                partInfo.resource.amount = newAmount;
+                shouldClose = true;
+            }
+            if (GUILayout.Button("Cancel", buttonStyle))
+            {
+                shouldClose = true;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+
+            return shouldClose;
         }
     }
 }
