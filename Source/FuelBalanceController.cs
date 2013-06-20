@@ -130,6 +130,15 @@ namespace Tac
 
                 BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.BALANCE
                     || (resourceInfo.balance && rpm.direction == TransferDirection.NONE)));
+
+                if (settings.BalanceIn)
+                {
+                    BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.IN));
+                }
+                if (settings.BalanceOut)
+                {
+                    BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.OUT));
+                }
             }
         }
 
@@ -306,7 +315,7 @@ namespace Tac
         private void TransferIn(double deltaTime, ResourceInfo resourceInfo, ResourcePartMap partInfo)
         {
             var otherParts = resourceInfo.parts.FindAll(rpm => (rpm.resource.amount > 0)
-                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.OUT || rpm.direction == TransferDirection.DUMP));
+                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.OUT || rpm.direction == TransferDirection.DUMP || rpm.direction == TransferDirection.BALANCE));
             double available = Math.Min(settings.MaxFuelFlow * settings.RateMultiplier * deltaTime, partInfo.resource.maxAmount - partInfo.resource.amount);
             double takeFromEach = available / otherParts.Count;
             double totalTaken = 0.0;
@@ -328,7 +337,7 @@ namespace Tac
         private void TransferOut(double deltaTime, ResourceInfo resourceInfo, ResourcePartMap partInfo)
         {
             var otherParts = resourceInfo.parts.FindAll(rpm => ((rpm.resource.maxAmount - rpm.resource.amount) > 0)
-                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.IN));
+                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.IN || rpm.direction == TransferDirection.BALANCE));
             double available = Math.Min(settings.MaxFuelFlow * settings.RateMultiplier * deltaTime, partInfo.resource.amount);
             double giveToEach = available / otherParts.Count;
             double totalGiven = 0.0;

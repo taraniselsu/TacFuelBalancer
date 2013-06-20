@@ -17,6 +17,9 @@ namespace Tac
         public bool ShowCurrentAmount { get; set; }
         public bool ShowPercentFull { get; set; }
 
+        public bool BalanceIn { get; set; }
+        public bool BalanceOut { get; set; }
+
         public bool Debug { get; set; }
 
         public Settings()
@@ -30,6 +33,9 @@ namespace Tac
             ShowMaxAmount = true;
             ShowCurrentAmount = true;
             ShowPercentFull = true;
+
+            BalanceIn = false;
+            BalanceOut = false;
 
             Debug = false;
         }
@@ -45,6 +51,9 @@ namespace Tac
             ShowMaxAmount = Utilities.GetValue(config, "ShowMaxAmount", ShowMaxAmount);
             ShowCurrentAmount = Utilities.GetValue(config, "ShowCurrentAmount", ShowCurrentAmount);
             ShowPercentFull = Utilities.GetValue(config, "ShowPercentFull", ShowPercentFull);
+
+            BalanceIn = Utilities.GetValue(config, "BalanceIn", BalanceIn);
+            BalanceOut = Utilities.GetValue(config, "BalanceOut", BalanceOut);
             
             Debug = Utilities.GetValue(config, "Debug", Debug);
         }
@@ -60,6 +69,9 @@ namespace Tac
             config.AddValue("ShowMaxAmount", ShowMaxAmount);
             config.AddValue("ShowCurrentAmount", ShowCurrentAmount);
             config.AddValue("ShowPercentFull", ShowPercentFull);
+
+            config.AddValue("BalanceIn", BalanceIn);
+            config.AddValue("BalanceOut", BalanceOut);
 
             config.AddValue("Debug", Debug);
         }
