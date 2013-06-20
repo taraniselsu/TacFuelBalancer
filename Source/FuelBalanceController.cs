@@ -30,7 +30,9 @@ namespace Tac
 
             settingsWindow = new SettingsWindow(settings);
             helpWindow = new HelpWindow();
+            helpWindow.SetSize(500, 200);
             mainWindow = new MainWindow(this, settings, settingsWindow, helpWindow);
+            mainWindow.SetSize(300, 200);
 
             icon = new Icon<FuelBalanceController>(new Rect(Screen.width * 0.8f, 0, 32, 32), "icon.png",
                 "Click to show the Fuel Balancer", OnIconClicked);
@@ -78,16 +80,31 @@ namespace Tac
                 return;
             }
 
-            if (FlightGlobals.fetch.activeVessel == null)
+            Vessel activeVessel = FlightGlobals.fetch.activeVessel;
+            if (activeVessel == null)
             {
                 Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: No active vessel yet.");
                 return;
             }
+            else if (activeVessel.isEVA)
+            {
+                icon.SetVisible(false);
+                mainWindow.SetVisible(false);
+                return;
+            }
+            else if (!icon.IsVisible())
+            {
+                icon.SetVisible(true);
+            }
 
-            Vessel activeVessel = FlightGlobals.fetch.activeVessel;
             if (activeVessel != currentVessel || activeVessel.Parts.Count != numberOfParts || activeVessel.situation != vesselSituation)
             {
                 RebuildLists(activeVessel);
+            }
+
+            if (!HasPower())
+            {
+                return;
             }
 
             // Do any fuel transfers
@@ -95,6 +112,8 @@ namespace Tac
             {
                 foreach (ResourcePartMap partInfo in resourceInfo.parts)
                 {
+                    SynchronizeFlowState(partInfo);
+
                     if (partInfo.direction == TransferDirection.IN)
                     {
                         TransferIn(Time.deltaTime, resourceInfo, partInfo);
@@ -111,6 +130,30 @@ namespace Tac
 
                 BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.BALANCE
                     || (resourceInfo.balance && rpm.direction == TransferDirection.NONE)));
+
+                if (settings.BalanceIn)
+                {
+                    BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.IN));
+                }
+                if (settings.BalanceOut)
+                {
+                    BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.OUT));
+                }
+            }
+        }
+
+        /*
+         * Checks the PartResource's flow state (controlled from the part's right click menu), and makes our state match its state.
+         */
+        private static void SynchronizeFlowState(ResourcePartMap partInfo)
+        {
+            if (partInfo.resource.flowState == true && partInfo.direction == TransferDirection.LOCKED)
+            {
+                partInfo.direction = TransferDirection.NONE;
+            }
+            else if (partInfo.resource.flowState == false && partInfo.direction != TransferDirection.LOCKED)
+            {
+                partInfo.direction = TransferDirection.LOCKED;
             }
         }
 
@@ -122,6 +165,27 @@ namespace Tac
         public bool IsPrelaunch()
         {
             return currentVessel.situation == Vessel.Situations.PRELAUNCH || currentVessel.situation == Vessel.Situations.LANDED;
+        }
+
+        public bool IsControllable()
+        {
+            return currentVessel.IsControllable && HasPower();
+        }
+
+        public bool HasPower()
+        {
+            foreach (Part part in currentVessel.parts)
+            {
+                foreach (PartResource resource in part.Resources)
+                {
+                    if (resource.resourceName.Equals("ElectricCharge") && resource.amount > 0.01)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void Load()
@@ -251,7 +315,7 @@ namespace Tac
         private void TransferIn(double deltaTime, ResourceInfo resourceInfo, ResourcePartMap partInfo)
         {
             var otherParts = resourceInfo.parts.FindAll(rpm => (rpm.resource.amount > 0)
-                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.OUT || rpm.direction == TransferDirection.DUMP));
+                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.OUT || rpm.direction == TransferDirection.DUMP || rpm.direction == TransferDirection.BALANCE));
             double available = Math.Min(settings.MaxFuelFlow * settings.RateMultiplier * deltaTime, partInfo.resource.maxAmount - partInfo.resource.amount);
             double takeFromEach = available / otherParts.Count;
             double totalTaken = 0.0;
@@ -273,7 +337,7 @@ namespace Tac
         private void TransferOut(double deltaTime, ResourceInfo resourceInfo, ResourcePartMap partInfo)
         {
             var otherParts = resourceInfo.parts.FindAll(rpm => ((rpm.resource.maxAmount - rpm.resource.amount) > 0)
-                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.IN));
+                && (rpm.direction == TransferDirection.NONE || rpm.direction == TransferDirection.IN || rpm.direction == TransferDirection.BALANCE));
             double available = Math.Min(settings.MaxFuelFlow * settings.RateMultiplier * deltaTime, partInfo.resource.amount);
             double giveToEach = available / otherParts.Count;
             double totalGiven = 0.0;

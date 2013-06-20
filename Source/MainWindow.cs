@@ -23,6 +23,7 @@ namespace Tac
         private GUIStyle editStyle;
 
         private double newAmount;
+        private bool isControllable;
 
         public MainWindow(FuelBalanceController controller, Settings settings, SettingsWindow settingsWindow, HelpWindow helpWindow)
             : base("TAC Fuel Balancer")
@@ -98,6 +99,9 @@ namespace Tac
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             GUILayout.BeginVertical();
 
+            // cache the value so we only do it once per call
+            isControllable = controller.IsControllable();
+
             foreach (KeyValuePair<string, ResourceInfo> pair in controller.GetResourceInfo())
             {
                 ResourceInfo resourceInfo = pair.Value;
@@ -106,7 +110,7 @@ namespace Tac
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(20);
                     GUILayout.Label(pair.Key, sectionStyle, GUILayout.Width(100));
-                    if (resourceInfo.parts[0].resource.info.resourceTransferMode == ResourceTransferMode.PUMP)
+                    if (resourceInfo.parts[0].resource.info.resourceTransferMode == ResourceTransferMode.PUMP && isControllable)
                     {
                         resourceInfo.balance = GUILayout.Toggle(resourceInfo.balance, "Balance All", buttonStyle);
                     }
@@ -220,7 +224,7 @@ namespace Tac
                 PopupWindow.Draw("Edit", windowPos, DrawEditPopupContents, popupButtonStyle, partInfo);
             }
 
-            if (partInfo.resource.info.resourceTransferMode == ResourceTransferMode.PUMP)
+            if (partInfo.resource.info.resourceTransferMode == ResourceTransferMode.PUMP && isControllable)
             {
                 if (GUILayout.Toggle((partInfo.direction == TransferDirection.IN), "Transfer In", popupButtonStyle))
                 {
@@ -261,10 +265,12 @@ namespace Tac
                 if (GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", popupButtonStyle))
                 {
                     partInfo.direction = TransferDirection.LOCKED;
+                    partInfo.resource.flowState = false;
                 }
                 else if (partInfo.direction == TransferDirection.LOCKED)
                 {
                     partInfo.direction = TransferDirection.NONE;
+                    partInfo.resource.flowState = true;
                 }
             }
 
