@@ -8,6 +8,7 @@ This mod is made available under the Attribution-NonCommercial-ShareAlike 3.0 (C
 
 Source code can be found at https://github.com/taraniselsu/TacFuelBalancer
 
+
 ===== Features =====
 * Transfer a resource into a part, drawing an equal amount from each other part.
 * Transfer a resource out of a part, tranferring an equal amount into each other part.
@@ -17,12 +18,15 @@ Source code can be found at https://github.com/taraniselsu/TacFuelBalancer
 * Enable balance mode to transfer a resource such that all parts are the same percentage
   full.
 * Lock a part, so that none of the resource will be transferred into or out of the part.
-  This does not prevent other systems, like engines, from drawing resources from the part.
-  It only disallows this system from transferring the resource.
 
 Note that it can transfer any resource that uses the "pump" resource transfer mode,
 including liquid fuel, oxidizer, electric charge, kethane, and RCS fuel; but not resources
 such as solid rocket fuel.
+
+This system does not consume power itself, but the vessel is required to have power and
+required to be controllable (have a probe core or at least one Kerbal onboard). Otherwise,
+everything is disabled.
+
 
 ===== How to use =====
 Open the GUI using the button along the screen edge. It defaults to the top right-hand corner,
@@ -41,6 +45,21 @@ Click the button at the end of a row, and:
 Click the "S" button to bring up the settings menu.
 Click the "?" button to bring up the help/about menu.
 Click the "X" button to close the window.
+
+
+===== Settings =====
+* Maximum Fuel Flow Rate - controls how quickly fuel is transfered around. This limits each
+  action to only transfer up to the selected amount.
+* Fuel Warning Level - warns (yellow) when a resource drops below this percentage of capacity.
+* Fuel Warning Level - warns (red) when a resource drops below this percentage of capacity.
+* Show <whatever> - toggles the display of the columns on the main window.
+* Balance In's - when this is enabled, it will balance the resource level between parts that are
+  set to In. Note that this can cause the resource level in a part to drop until it evens out with
+  the other parts, then it will start increasing again.
+* Balance Out's - when this is enabled, it will balance the resource level between parts that
+  are set to Out. Note that this can cause the resource level in a part to rise until it evens out
+  with the other parts, then it will start decreasing again.
+
 
 ===== Installation procedure =====
 1) Copy everything in the GameData directory to the {KSP}/GameData directory.
