@@ -102,6 +102,11 @@ namespace Tac
                 RebuildLists(activeVessel);
             }
 
+            if (!HasPower())
+            {
+                return;
+            }
+
             // Do any fuel transfers
             foreach (ResourceInfo resourceInfo in resources.Values)
             {
@@ -151,6 +156,27 @@ namespace Tac
         public bool IsPrelaunch()
         {
             return currentVessel.situation == Vessel.Situations.PRELAUNCH || currentVessel.situation == Vessel.Situations.LANDED;
+        }
+
+        public bool IsControllable()
+        {
+            return currentVessel.IsControllable && HasPower();
+        }
+
+        public bool HasPower()
+        {
+            foreach (Part part in currentVessel.parts)
+            {
+                foreach (PartResource resource in part.Resources)
+                {
+                    if (resource.resourceName.Equals("ElectricCharge") && resource.amount > 0.01)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void Load()
