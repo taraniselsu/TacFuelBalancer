@@ -97,6 +97,8 @@ namespace Tac
             {
                 foreach (ResourcePartMap partInfo in resourceInfo.parts)
                 {
+                    SynchronizeFlowState(partInfo);
+
                     if (partInfo.direction == TransferDirection.IN)
                     {
                         TransferIn(Time.deltaTime, resourceInfo, partInfo);
@@ -113,6 +115,21 @@ namespace Tac
 
                 BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.BALANCE
                     || (resourceInfo.balance && rpm.direction == TransferDirection.NONE)));
+            }
+        }
+
+        /*
+         * Checks the PartResource's flow state (controlled from the part's right click menu), and makes our state match its state.
+         */
+        private static void SynchronizeFlowState(ResourcePartMap partInfo)
+        {
+            if (partInfo.resource.flowState == true && partInfo.direction == TransferDirection.LOCKED)
+            {
+                partInfo.direction = TransferDirection.NONE;
+            }
+            else if (partInfo.resource.flowState == false && partInfo.direction != TransferDirection.LOCKED)
+            {
+                partInfo.direction = TransferDirection.LOCKED;
             }
         }
 

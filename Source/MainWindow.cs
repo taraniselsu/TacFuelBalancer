@@ -261,10 +261,12 @@ namespace Tac
                 if (GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", popupButtonStyle))
                 {
                     partInfo.direction = TransferDirection.LOCKED;
+                    partInfo.resource.flowState = false;
                 }
                 else if (partInfo.direction == TransferDirection.LOCKED)
                 {
                     partInfo.direction = TransferDirection.NONE;
+                    partInfo.resource.flowState = true;
                 }
             }
 
