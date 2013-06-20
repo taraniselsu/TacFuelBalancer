@@ -80,13 +80,23 @@ namespace Tac
                 return;
             }
 
-            if (FlightGlobals.fetch.activeVessel == null)
+            Vessel activeVessel = FlightGlobals.fetch.activeVessel;
+            if (activeVessel == null)
             {
                 Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: No active vessel yet.");
                 return;
             }
+            else if (activeVessel.isEVA)
+            {
+                icon.SetVisible(false);
+                mainWindow.SetVisible(false);
+                return;
+            }
+            else if (!icon.IsVisible())
+            {
+                icon.SetVisible(true);
+            }
 
-            Vessel activeVessel = FlightGlobals.fetch.activeVessel;
             if (activeVessel != currentVessel || activeVessel.Parts.Count != numberOfParts || activeVessel.situation != vesselSituation)
             {
                 RebuildLists(activeVessel);
