@@ -44,6 +44,8 @@ public class TacFuelBalancer : PartModule
     private double maxFuelFlow;
     private double fuelWarningLevel;
     private double fuelCriticalLevel;
+    private bool balanceOUT;
+    private bool balanceIN;
     private bool debug;
 
     public override void OnAwake()
@@ -99,6 +101,14 @@ public class TacFuelBalancer : PartModule
                 }
 
                 bool newBoolValue;
+                if (config.HasValue("balanceOUT") && bool.TryParse(config.GetValue("balanceOUT"), out newBoolValue))
+                {
+                    balanceOUT = newBoolValue;
+                }
+                if (config.HasValue("balanceIN") && bool.TryParse(config.GetValue("balanceIN"), out newBoolValue))
+                {
+                    balanceIN = newBoolValue;
+                }
                 if (config.HasValue("debug") && bool.TryParse(config.GetValue("debug"), out newBoolValue))
                 {
                     debug = newBoolValue;
@@ -135,6 +145,8 @@ public class TacFuelBalancer : PartModule
             config.AddValue("maxFuelFlow", maxFuelFlow);
             config.AddValue("fuelWarningLevel", fuelWarningLevel);
             config.AddValue("fuelCriticalLevel", fuelCriticalLevel);
+            config.AddValue("balanceOUT", balanceOUT);
+            config.AddValue("balanceIN", balanceIN);
             config.AddValue("debug", debug);
 
             config.Save(filename);
@@ -183,12 +195,12 @@ public class TacFuelBalancer : PartModule
                 // Do any fuel transfers
                 foreach (ResourceInfo resourceInfo in resources.Values)
                 {
-                    if (resourceInfo.balance)
-                    {
-                        BalanceResources(deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction != TransferDirection.LOCKED));
-                    }
-                    else
-                    {
+//                    if (resourceInfo.balance)
+//                    {
+//                        BalanceResources(deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction != TransferDirection.LOCKED));
+//                    }
+//                    else
+//                    {
                         foreach (ResourcePartMap partInfo in resourceInfo.parts)
                         {
                             if (partInfo.direction == TransferDirection.IN)
@@ -200,7 +212,7 @@ public class TacFuelBalancer : PartModule
                                 TransferOut(deltaTime, resourceInfo, partInfo);
                             }
                         }
-                    }
+//                    }
 
                     foreach (ResourcePartMap partInfo in resourceInfo.parts)
                     {
@@ -209,6 +221,36 @@ public class TacFuelBalancer : PartModule
                             partInfo.part.SetHighlightColor(Color.blue);
                             partInfo.part.SetHighlight(true);
                         }
+                    }
+                    
+                    if (resourceInfo.balance)
+                    {
+						if (resourceInfo.balance) {
+							var selected = resourceInfo.parts.FindAll(pi => pi.isSelected);
+							if (selected.Count > 0) {
+								BalanceResources(deltaTime, selected);
+							}
+							else {
+								BalanceResources(deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction != TransferDirection.LOCKED));
+							}
+						}
+                    }
+                    
+                    if ((balanceOUT || balanceIN) && resourceInfo.parts.Count(pi => pi.direction != TransferDirection.NONE) > 0) {
+                    	if (balanceOUT) {
+                    		var outs = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.OUT);
+                    		if (outs.Count > 0) {
+                    			BalanceResources(deltaTime, outs);
+                    		}
+                    	}
+                    	
+                    	if (balanceIN) {
+                    		var ins  = resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.IN);
+                    		if (ins.Count > 0) {
+                    			BalanceResources(deltaTime, ins);
+//								BalanceResources(deltaTime, resourceInfo.parts.FindAll(pi => pi.direction == TransferDirection.NONE));
+                    		}
+                    	}
                     }
                 }
             }
@@ -369,12 +411,14 @@ public class TacFuelBalancer : PartModule
     [KSPEvent(guiActive = true, guiName = "Show Fuel Balancer", active = true)]
     public void ShowFuelBalancerWindow()
     {
+    	OnLoad(null); // load settings
         mainWindow.SetVisible(true);
     }
 
     [KSPEvent(guiActive = true, guiName = "Hide Fuel Balancer", active = false)]
     public void HideFuelBalancerWindow()
     {
+    	OnSave(null); // save settings
         mainWindow.SetVisible(false);
     }
 
@@ -449,6 +493,7 @@ public class TacFuelBalancer : PartModule
             }
             if (GUILayout.Button("X", buttonStyle))
             {
+            	parent.OnSave(null); // saving settings
                 SetVisible(false);
             }
             GUILayout.EndHorizontal();
@@ -596,6 +641,9 @@ public class TacFuelBalancer : PartModule
                 parent.fuelCriticalLevel = temp;
             }
             GUILayout.EndHorizontal();
+
+            parent.balanceOUT = GUILayout.Toggle(parent.balanceOUT, "Balance OUT Transfer");
+            parent.balanceIN = GUILayout.Toggle(parent.balanceIN, "Balance IN Transfer");
 
             parent.debug = GUILayout.Toggle(parent.debug, "Debug");
 
