@@ -30,7 +30,9 @@ namespace Tac
 
             settingsWindow = new SettingsWindow(settings);
             helpWindow = new HelpWindow();
+            helpWindow.SetSize(500, 200);
             mainWindow = new MainWindow(this, settings, settingsWindow, helpWindow);
+            mainWindow.SetSize(300, 200);
 
             icon = new Icon<FuelBalanceController>(new Rect(Screen.width * 0.8f, 0, 32, 32), "icon.png",
                 "Click to show the Fuel Balancer", OnIconClicked);
