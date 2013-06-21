@@ -64,12 +64,12 @@ namespace Tac
 
             GUILayout.Space(20);
 
-            settings.BalanceIn = GUILayout.Toggle(settings.ShowPercentFull, "Balance In's");
-            settings.BalanceOut = GUILayout.Toggle(settings.ShowPercentFull, "Balance Out's");
+            settings.BalanceIn = GUILayout.Toggle(settings.BalanceIn, "Balance In's");
+            settings.BalanceOut = GUILayout.Toggle(settings.BalanceOut, "Balance Out's");
 
-            GUILayout.Space(20);
+            //GUILayout.Space(20);
 
-            settings.Debug = GUILayout.Toggle(settings.Debug, "Debug");
+            //settings.Debug = GUILayout.Toggle(settings.Debug, "Debug");
 
             GUILayout.EndVertical();
         }

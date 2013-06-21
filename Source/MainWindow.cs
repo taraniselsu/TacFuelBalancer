@@ -226,6 +226,11 @@ namespace Tac
 
             if (partInfo.resource.info.resourceTransferMode == ResourceTransferMode.PUMP && isControllable)
             {
+                if (GUILayout.Toggle((partInfo.direction == TransferDirection.NONE), "Stop", popupButtonStyle))
+                {
+                    partInfo.direction = TransferDirection.NONE;
+                }
+
                 if (GUILayout.Toggle((partInfo.direction == TransferDirection.IN), "Transfer In", popupButtonStyle))
                 {
                     partInfo.direction = TransferDirection.IN;
