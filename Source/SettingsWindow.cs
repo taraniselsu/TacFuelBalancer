@@ -61,6 +61,7 @@ namespace Tac
             settings.ShowMaxAmount = GUILayout.Toggle(settings.ShowMaxAmount, "Show Maximum Amount");
             settings.ShowCurrentAmount = GUILayout.Toggle(settings.ShowCurrentAmount, "Show Current Amount");
             settings.ShowPercentFull = GUILayout.Toggle(settings.ShowPercentFull, "Show Percent Full");
+            settings.ShowDump = GUILayout.Toggle(settings.ShowDump, "Show Dump");
 
             GUILayout.Space(20);
 

@@ -258,13 +258,15 @@ namespace Tac
                     partInfo.direction = TransferDirection.NONE;
                 }
 
-                if (GUILayout.Toggle((partInfo.direction == TransferDirection.DUMP), "Dump", popupButtonStyle))
-                {
-                    partInfo.direction = TransferDirection.DUMP;
-                }
-                else if (partInfo.direction == TransferDirection.DUMP)
-                {
-                    partInfo.direction = TransferDirection.NONE;
+                if (settings.ShowDump) {
+	                if (GUILayout.Toggle((partInfo.direction == TransferDirection.DUMP), "Dump", popupButtonStyle))
+	                {
+	                    partInfo.direction = TransferDirection.DUMP;
+	                }
+	                else if (partInfo.direction == TransferDirection.DUMP)
+	                {
+	                    partInfo.direction = TransferDirection.NONE;
+	                }
                 }
 
                 if (GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", popupButtonStyle))
