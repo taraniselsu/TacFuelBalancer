@@ -36,63 +36,64 @@ namespace Tac
 {
     public class TacFuelBalancer : PartModule
     {
-        public override void OnAwake()
-        {
-            base.OnAwake();
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnAwake");
-        }
+        // Kept for future expansion.
+        //public override void OnAwake()
+        //{
+        //    base.OnAwake();
+        //    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnAwake");
+        //}
 
-        public override void OnLoad(ConfigNode node)
-        {
-            base.OnLoad(node);
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnLoad");
-        }
+        //public override void OnLoad(ConfigNode node)
+        //{
+        //    base.OnLoad(node);
+        //    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnLoad");
+        //}
 
-        public override void OnSave(ConfigNode node)
-        {
-            base.OnSave(node);
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnSave");
-        }
+        //public override void OnSave(ConfigNode node)
+        //{
+        //    base.OnSave(node);
+        //    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnSave");
+        //}
 
-        public override void OnStart(PartModule.StartState state)
-        {
-            base.OnStart(state);
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnStart: " + state);
+        //public override void OnStart(PartModule.StartState state)
+        //{
+        //    base.OnStart(state);
+        //    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnStart: " + state);
 
-            if (state != StartState.Editor)
-            {
-                vessel.OnJustAboutToBeDestroyed += CleanUp;
-                part.OnJustAboutToBeDestroyed += CleanUp;
-            }
-        }
+        //    if (state != StartState.Editor)
+        //    {
+        //        vessel.OnJustAboutToBeDestroyed += CleanUp;
+        //        part.OnJustAboutToBeDestroyed += CleanUp;
+        //    }
+        //}
 
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-        }
+        //public override void OnUpdate()
+        //{
+        //    base.OnUpdate();
+        //}
 
-        private void CleanUp()
-        {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: CleanUp");
-        }
+        //private void CleanUp()
+        //{
+        //    Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: CleanUp");
+        //}
 
-        [KSPEvent(guiActive = true, guiName = "Show Fuel Balancer", active = true)]
-        public void ShowFuelBalancerWindow()
-        {
-            //mainWindow.SetVisible(true);
-        }
+        //[KSPEvent(guiActive = true, guiName = "Show Fuel Balancer", active = true)]
+        //public void ShowFuelBalancerWindow()
+        //{
+        //    mainWindow.SetVisible(true);
+        //}
 
-        [KSPEvent(guiActive = true, guiName = "Hide Fuel Balancer", active = false)]
-        public void HideFuelBalancerWindow()
-        {
-            //mainWindow.SetVisible(false);
-        }
+        //[KSPEvent(guiActive = true, guiName = "Hide Fuel Balancer", active = false)]
+        //public void HideFuelBalancerWindow()
+        //{
+        //    mainWindow.SetVisible(false);
+        //}
 
-        [KSPAction("Toggle Fuel Balancer")]
-        public void ToggleFuelBalancerWindow(KSPActionParam param)
-        {
-            //mainWindow.SetVisible(!mainWindow.IsVisible());
-        }
+        //[KSPAction("Toggle Fuel Balancer")]
+        //public void ToggleFuelBalancerWindow(KSPActionParam param)
+        //{
+        //    mainWindow.SetVisible(!mainWindow.IsVisible());
+        //}
     }
 
     public enum TransferDirection

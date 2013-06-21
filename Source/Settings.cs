@@ -24,7 +24,7 @@ namespace Tac
 
         public Settings()
         {
-            MaxFuelFlow = 100.0;
+            MaxFuelFlow = 10.0;
             RateMultiplier = 1.0;
             FuelWarningLevel = 25.0;
             FuelCriticalLevel = 5.0;
