@@ -34,7 +34,7 @@ namespace Tac
             mainWindow = new MainWindow(this, settings, settingsWindow, helpWindow);
             mainWindow.SetSize(300, 200);
 
-            icon = new Icon<FuelBalanceController>(new Rect(Screen.width * 0.7f, 0, 32, 32), "icon.png",
+            icon = new Icon<FuelBalanceController>(new Rect(Screen.width * 0.7f, 0, 32, 32), "icon.png", "FB",
                 "Click to show the Fuel Balancer", OnIconClicked);
 
             resources = new Dictionary<string, ResourceInfo>();
