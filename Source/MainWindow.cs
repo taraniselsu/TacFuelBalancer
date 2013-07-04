@@ -53,7 +53,7 @@ namespace Tac
         private bool isControllable;
 
         public MainWindow(FuelBalanceController controller, Settings settings, SettingsWindow settingsWindow, HelpWindow helpWindow)
-            : base("TAC Fuel Balancer")
+            : base("TAC Fuel Balancer", 400, 500)
         {
             this.controller = controller;
             this.settings = settings;

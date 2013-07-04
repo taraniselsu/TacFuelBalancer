@@ -40,7 +40,7 @@ namespace Tac
         private GUIStyle editStyle;
 
         public SettingsWindow(Settings settings)
-            : base("TAC Fuel Balancer Settings")
+            : base("TAC Fuel Balancer Settings", 240, 360)
         {
             this.settings = settings;
         }

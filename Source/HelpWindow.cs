@@ -40,7 +40,7 @@ namespace Tac
         private Vector2 scrollPosition;
 
         public HelpWindow()
-            : base("TAC Fuel Balancer Help")
+            : base("TAC Fuel Balancer Help", 500, Screen.height * 0.75f)
         {
             scrollPosition = Vector2.zero;
         }
@@ -92,10 +92,10 @@ namespace Tac
             GUILayout.Label("* Balance In's - when this is enabled, it will balance the resource level between parts that are set to In. Note that this can cause the resource level in a part to drop until it evens out with the other parts, then it will start increasing again.", labelStyle, GUILayout.ExpandWidth(true));
             GUILayout.Label("* Balance Out's - when this is enabled, it will balance the resource level between parts that are set to Out. Note that this can cause the resource level in a part to rise until it evens out with the other parts, then it will start decreasing again.", labelStyle, GUILayout.ExpandWidth(true));
 
-            GUILayout.Space(8);
-
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
+
+            GUILayout.Space(8);
         }
     }
 }
