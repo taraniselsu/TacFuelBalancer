@@ -7,7 +7,7 @@
     <ProjectGuid>{B555E3BB-A066-4AE1-8AC4-09F1B7D68FC1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TacFuelBalancer</RootNamespace>
+    <RootNamespace>Tac</RootNamespace>
     <AssemblyName>TacFuelBalancer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
