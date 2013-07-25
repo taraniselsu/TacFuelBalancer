@@ -35,10 +35,10 @@ namespace Tac
 {
     class MainWindow : Window<TacFuelBalancer>
     {
-        private FuelBalanceController controller;
-        private Settings settings;
-        private SettingsWindow settingsWindow;
-        private HelpWindow helpWindow;
+        private readonly FuelBalanceController controller;
+        private readonly Settings settings;
+        private readonly SettingsWindow settingsWindow;
+        private readonly HelpWindow helpWindow;
 
         private Vector2 headerScrollPosition;
         private Vector2 scrollPosition;

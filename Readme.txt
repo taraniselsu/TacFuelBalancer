@@ -11,7 +11,7 @@ Source code can be found at https://github.com/taraniselsu/TacFuelBalancer
 
 ===== Features =====
 * Transfer a resource into a part, drawing an equal amount from each other part.
-* Transfer a resource out of a part, tranferring an equal amount into each other part.
+* Transfer a resource out of a part, transferring an equal amount into each other part.
 * Dump a resource out of a part. Note that the resource is lost, never to be found.
 * When still Prelaunch (or Landed): edit the amount of a resource loaded in a part. Works
   on all resources, even solid rocket fuel.
@@ -24,7 +24,7 @@ including liquid fuel, oxidizer, electric charge, kethane, and RCS fuel; but not
 such as solid rocket fuel.
 
 This system does not consume power itself, but the vessel is required to have power and
-required to be controllable (have a probe core or at least one Kerbal onboard). Otherwise,
+required to be controllable (have a probe core or at least one Kerbal on-board). Otherwise,
 everything is disabled.
 
 
@@ -48,7 +48,7 @@ Click the "X" button to close the window.
 
 
 ===== Settings =====
-* Maximum Fuel Flow Rate - controls how quickly fuel is transfered around. This limits each
+* Maximum Fuel Flow Rate - controls how quickly fuel is transferred around. This limits each
   action to only transfer up to the selected amount.
 * Fuel Warning Level - warns (yellow) when a resource drops below this percentage of capacity.
 * Fuel Warning Level - warns (red) when a resource drops below this percentage of capacity.
