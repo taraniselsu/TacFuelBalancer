@@ -20,7 +20,7 @@ Source code can be found at https://github.com/taraniselsu/TacFuelBalancer
 * Lock a part, so that none of the resource will be transferred into or out of the part.
 
 Note that it can transfer any resource that uses the "pump" resource transfer mode,
-including liquid fuel, oxidizer, electric charge, kethane, and RCS fuel; but not resources
+including liquid fuel, oxidizer, electric charge, Kethane, and RCS fuel; but not resources
 such as solid rocket fuel.
 
 This system does not consume power itself, but the vessel is required to have power and

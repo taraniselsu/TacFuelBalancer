@@ -163,7 +163,8 @@ namespace Tac
                         }
 
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(part.partInfo.title, labelStyle);
+                        string partTitle = part.partInfo.title;
+                        GUILayout.Label(partTitle.Substring(0, Math.Min(30, partTitle.Length)), labelStyle);
                         GUILayout.FlexibleSpace();
                         if (settings.ShowStageNumber)
                         {
