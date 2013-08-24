@@ -73,6 +73,9 @@ namespace Tac
             Load();
 
             icon.SetVisible(true);
+
+            // Make sure the resource/part list is correct after other mods, such as StretchyTanks, do their thing.
+            Invoke("RebuildActiveVesselLists", 1.0f);
         }
 
         void OnDestroy()
@@ -99,7 +102,7 @@ namespace Tac
 
         void FixedUpdate()
         {
-            if (!FlightGlobals.fetch)
+            if (!FlightGlobals.ready)
             {
                 Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: FlightGlobals are not valid yet.");
                 return;
@@ -122,7 +125,7 @@ namespace Tac
                 icon.SetVisible(true);
             }
 
-            if (activeVessel != currentVessel || activeVessel.Parts.Count != numberOfParts || activeVessel.situation != vesselSituation)
+            if (activeVessel != currentVessel || activeVessel.situation != vesselSituation || activeVessel.Parts.Count != numberOfParts)
             {
                 RebuildLists(activeVessel);
             }
@@ -270,9 +273,16 @@ namespace Tac
                     if (resources.ContainsKey(resource.resourceName))
                     {
                         List<ResourcePartMap> resourceParts = resources[resource.resourceName].parts;
-                        if (!resourceParts.Exists(partInfo => partInfo.part.Equals(part)))
+                        ResourcePartMap partInfo = resourceParts.Find(info => info.part.Equals(part));
+
+                        if (partInfo == null)
                         {
                             resourceParts.Add(new ResourcePartMap(resource, part));
+                        }
+                        else
+                        {
+                            // Make sure we are still pointing at the right resource instance. This is a fix for compatibility with StretchyTanks.
+                            partInfo.resource = resource;
                         }
                     }
                     else
@@ -288,6 +298,14 @@ namespace Tac
             numberOfParts = vessel.parts.Count;
             currentVessel = vessel;
             vesselSituation = vessel.situation;
+        }
+
+        private void RebuildActiveVesselLists()
+        {
+            if (FlightGlobals.ready && FlightGlobals.fetch.activeVessel != null)
+            {
+                RebuildLists(FlightGlobals.fetch.activeVessel);
+            }
         }
 
         private void BalanceResources(double deltaTime, List<ResourcePartMap> balanceParts)
