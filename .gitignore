@@ -1,5 +1,5 @@
-GameData/**/*.dll
-
+GameData/ThunderAerospace/**/*.dll
+GameData/ThunderAerospace/*_*.*.txt
 
 #################
 ## Eclipse
