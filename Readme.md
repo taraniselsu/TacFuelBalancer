@@ -1,15 +1,15 @@
-A Fuel Balancer from Thunder Aerospace Corporation (TAC),
-designed by Taranis Elsu.
+TAC Fuel Balancer
+===================
+
+A Fuel Balancer from Thunder Aerospace Corporation (TAC), designed by Taranis Elsu.
 
 For use with the Kerbal Space Program, http://kerbalspaceprogram.com/
 
-This mod is made available under the Attribution-NonCommercial-ShareAlike 3.0 (CC BY-NC-SA
-3.0) creative commons license. See the LICENSE.txt file.
+This mod is made available under the Attribution-NonCommercial-ShareAlike 3.0 (CC BY-NC-SA 3.0) creative commons license. See the LICENSE.txt file.
 
 Source code can be found at https://github.com/taraniselsu/TacFuelBalancer
 
-
-===== Features =====
+### Features
 * Transfer a resource into a part, drawing an equal amount from each other part.
 * Transfer a resource out of a part, transferring an equal amount into each other part.
 * Dump a resource out of a part. Note that the resource is lost, never to be found.
@@ -27,8 +27,7 @@ This system does not consume power itself, but the vessel is required to have po
 required to be controllable (have a probe core or at least one Kerbal on-board). Otherwise,
 everything is disabled.
 
-
-===== How to use =====
+### How to use
 Open the GUI using the button along the screen edge. It defaults to the top right-hand corner,
 but can be dragged to anywhere along any edge.
 
@@ -46,8 +45,7 @@ Click the "S" button to bring up the settings menu.
 Click the "?" button to bring up the help/about menu.
 Click the "X" button to close the window.
 
-
-===== Settings =====
+### Settings
 * Maximum Fuel Flow Rate - controls how quickly fuel is transferred around. This limits each
   action to only transfer up to the selected amount.
 * Fuel Warning Level - warns (yellow) when a resource drops below this percentage of capacity.
@@ -60,6 +58,5 @@ Click the "X" button to close the window.
   are set to Out. Note that this can cause the resource level in a part to rise until it evens out
   with the other parts, then it will start decreasing again.
 
-
-===== Installation procedure =====
+### Installation procedure
 1) Copy everything in the GameData directory to the {KSP}/GameData directory.

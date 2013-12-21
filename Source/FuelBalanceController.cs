@@ -50,7 +50,7 @@ namespace Tac
 
         void Awake()
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: Awake");
+            this.Log("Awake");
             configFilename = IOUtils.GetFilePathFor(this.GetType(), "FuelBalancer.cfg");
 
             settings = new Settings();
@@ -69,7 +69,7 @@ namespace Tac
 
         void Start()
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: Start");
+            this.Log("Start");
             Load();
 
             icon.SetVisible(true);
@@ -80,7 +80,7 @@ namespace Tac
 
         void OnDestroy()
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: OnDestroy");
+            this.Log("OnDestroy");
             icon.SetVisible(false);
             Save();
         }
@@ -104,14 +104,14 @@ namespace Tac
         {
             if (!FlightGlobals.ready)
             {
-                Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: FlightGlobals are not valid yet.");
+                this.Log("FlightGlobals are not valid yet.");
                 return;
             }
 
             Vessel activeVessel = FlightGlobals.fetch.activeVessel;
             if (activeVessel == null)
             {
-                Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: No active vessel yet.");
+                this.Log("No active vessel yet.");
                 return;
             }
             else if (activeVessel.isEVA)
@@ -248,7 +248,7 @@ namespace Tac
 
         private void RebuildLists(Vessel vessel)
         {
-            Debug.Log("TAC Fuel Balancer [" + this.GetInstanceID().ToString("X") + "][" + Time.time + "]: Rebuilding resource lists.");
+            this.Log("Rebuilding resource lists.");
 
             List<string> toDelete = new List<string>();
             foreach (KeyValuePair<string, ResourceInfo> resourceEntry in resources)
