@@ -42,7 +42,7 @@ namespace Tac
         private SettingsWindow settingsWindow;
         private HelpWindow helpWindow;
         private string configFilename;
-        private Icon<FuelBalanceController> icon;
+        private ButtonWrapper button;
         private Dictionary<string, ResourceInfo> resources;
         private Vessel currentVessel;
         private int numberOfParts;
@@ -59,8 +59,9 @@ namespace Tac
             helpWindow = new HelpWindow();
             mainWindow = new MainWindow(this, settings, settingsWindow, helpWindow);
 
-            icon = new Icon<FuelBalanceController>(new Rect(Screen.width * 0.7f, 0, 32, 32), "icon.png", "FB",
-                "Click to show the Fuel Balancer", OnIconClicked);
+            button = new ButtonWrapper(new Rect(Screen.width * 0.7f, 0, 32, 32),
+                "ThunderAerospace/TacFuelBalancer/Textures/button", "FB",
+                "TAC Fuel Balancer", OnIconClicked);
 
             resources = new Dictionary<string, ResourceInfo>();
             numberOfParts = 0;
@@ -72,7 +73,7 @@ namespace Tac
             this.Log("Start");
             Load();
 
-            icon.SetVisible(true);
+            button.Visible = true;
 
             // Make sure the resource/part list is correct after other mods, such as StretchyTanks, do their thing.
             Invoke("RebuildActiveVesselLists", 1.0f);
@@ -81,8 +82,8 @@ namespace Tac
         void OnDestroy()
         {
             this.Log("OnDestroy");
-            icon.SetVisible(false);
             Save();
+            button.Destroy();
         }
 
         void Update()
@@ -116,13 +117,13 @@ namespace Tac
             }
             else if (activeVessel.isEVA)
             {
-                icon.SetVisible(false);
+                button.Visible = false;
                 mainWindow.SetVisible(false);
                 return;
             }
-            else if (!icon.IsVisible())
+            else if (!button.Visible)
             {
-                icon.SetVisible(true);
+                button.Visible = true;
             }
 
             if (activeVessel != currentVessel || activeVessel.situation != vesselSituation || activeVessel.Parts.Count != numberOfParts)
@@ -222,7 +223,7 @@ namespace Tac
             {
                 ConfigNode config = ConfigNode.Load(configFilename);
                 settings.Load(config);
-                icon.Load(config);
+                button.Load(config);
                 mainWindow.Load(config);
                 settingsWindow.Load(config);
                 helpWindow.Load(config);
@@ -233,7 +234,7 @@ namespace Tac
         {
             ConfigNode config = new ConfigNode();
             settings.Save(config);
-            icon.Save(config);
+            button.Save(config);
             mainWindow.Save(config);
             settingsWindow.Save(config);
             helpWindow.Save(config);

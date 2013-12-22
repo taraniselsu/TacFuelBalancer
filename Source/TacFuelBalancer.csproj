@@ -35,10 +35,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(KSP)\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(KSP)\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +47,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\TacLib\Source\ButtonWrapper.cs">
+      <Link>ButtonWrapper.cs</Link>
+    </Compile>
     <Compile Include="..\TacLib\Source\Icon.cs">
       <Link>Icon.cs</Link>
     </Compile>
@@ -59,6 +58,12 @@
     </Compile>
     <Compile Include="..\TacLib\Source\PopupWindow.cs">
       <Link>PopupWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\TacLib\Source\ToolbarButton.cs">
+      <Link>ToolbarButton.cs</Link>
+    </Compile>
+    <Compile Include="..\TacLib\Source\ToolbarWrapper.cs">
+      <Link>ToolbarWrapper.cs</Link>
     </Compile>
     <Compile Include="..\TacLib\Source\Utilities.cs">
       <Link>Utilities.cs</Link>
@@ -78,7 +83,8 @@
   <Import Project="..\TacLib\Source\CommonProperties.proj" />
   <PropertyGroup>
     <AssemblyMajorVersion>2</AssemblyMajorVersion>
-    <AssemblyMinorVersion>2</AssemblyMinorVersion>
+    <AssemblyMinorVersion>3</AssemblyMinorVersion>
+    <AssemblyFileBuildNumber>0</AssemblyFileBuildNumber>
     <AssemblyFileMajorVersion>$(AssemblyMajorVersion)</AssemblyFileMajorVersion>
     <AssemblyFileMinorVersion>$(AssemblyMinorVersion)</AssemblyFileMinorVersion>
   </PropertyGroup>
