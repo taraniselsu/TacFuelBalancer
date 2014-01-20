@@ -193,7 +193,8 @@ namespace Tac
 
         public bool IsPrelaunch()
         {
-            return currentVessel.situation == Vessel.Situations.PRELAUNCH || currentVessel.situation == Vessel.Situations.LANDED;
+            return (currentVessel.mainBody == FlightGlobals.Bodies[1]) &&
+                (currentVessel.situation == Vessel.Situations.PRELAUNCH || currentVessel.situation == Vessel.Situations.LANDED);
         }
 
         public bool IsControllable()
