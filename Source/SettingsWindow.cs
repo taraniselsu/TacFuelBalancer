@@ -35,14 +35,18 @@ namespace Tac
 {
     class SettingsWindow : Window<TacFuelBalancer>
     {
-        private Settings settings;
+        private readonly Settings settings;
+        private readonly string version;
+
         private GUIStyle labelStyle;
         private GUIStyle editStyle;
+        private GUIStyle versionStyle;
 
         public SettingsWindow(Settings settings)
             : base("TAC Fuel Balancer Settings", 240, 360)
         {
             this.settings = settings;
+            version = Utilities.GetDllVersion(this);
         }
 
         protected override void ConfigureStyles()
@@ -57,6 +61,8 @@ namespace Tac
                 labelStyle.normal.textColor = Color.white;
 
                 editStyle = new GUIStyle(GUI.skin.textField);
+
+                versionStyle = Utilities.GetVersionStyle();
             }
         }
 
@@ -82,7 +88,7 @@ namespace Tac
             settings.FuelCriticalLevel = Utilities.ShowTextField(settings.FuelCriticalLevel, 10, editStyle, GUILayout.MinWidth(50));
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(20);
+            GUILayout.Space(10);
 
             settings.ShowStageNumber = GUILayout.Toggle(settings.ShowStageNumber, "Show Stage Number");
             settings.ShowMaxAmount = GUILayout.Toggle(settings.ShowMaxAmount, "Show Maximum Amount");
@@ -90,16 +96,15 @@ namespace Tac
             settings.ShowPercentFull = GUILayout.Toggle(settings.ShowPercentFull, "Show Percent Full");
             settings.ShowDump = GUILayout.Toggle(settings.ShowDump, "Show Dump");
 
-            GUILayout.Space(20);
+            GUILayout.Space(10);
 
             settings.BalanceIn = GUILayout.Toggle(settings.BalanceIn, "Balance In's");
             settings.BalanceOut = GUILayout.Toggle(settings.BalanceOut, "Balance Out's");
 
-            //GUILayout.Space(20);
-
-            //settings.Debug = GUILayout.Toggle(settings.Debug, "Debug");
-
             GUILayout.EndVertical();
+
+            GUILayout.Space(4);
+            GUI.Label(new Rect(4, windowPos.height - 13, windowPos.width - 20, 12), "TAC Fuel Balancer v" + version, versionStyle);
         }
     }
 }
