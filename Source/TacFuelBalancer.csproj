@@ -71,6 +71,7 @@
     <Compile Include="..\TacLib\Source\Window.cs">
       <Link>Window.cs</Link>
     </Compile>
+    <Compile Include="InstallChecker.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="SettingsWindow.cs" />
     <Compile Include="FuelBalanceController.cs" />
