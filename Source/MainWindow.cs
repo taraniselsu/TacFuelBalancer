@@ -40,8 +40,8 @@ namespace Tac
         private readonly SettingsWindow settingsWindow;
         private readonly HelpWindow helpWindow;
 
-        private Vector2 headerScrollPosition;
-        private Vector2 scrollPosition;
+        private Vector2 headerScrollPosition = Vector2.zero;
+        private Vector2 scrollPosition = Vector2.zero;
 
         private GUIStyle buttonStyle;
         private GUIStyle labelStyle;
@@ -59,9 +59,7 @@ namespace Tac
             this.settings = settings;
             this.settingsWindow = settingsWindow;
             this.helpWindow = helpWindow;
-
-            headerScrollPosition = Vector2.zero;
-            scrollPosition = Vector2.zero;
+            SetVisible(true);
         }
 
         public override void SetVisible(bool newValue)
@@ -290,15 +288,16 @@ namespace Tac
                     partInfo.direction = TransferDirection.NONE;
                 }
 
-                if (settings.ShowDump) {
-	                if (GUILayout.Toggle((partInfo.direction == TransferDirection.DUMP), "Dump", popupButtonStyle))
-	                {
-	                    partInfo.direction = TransferDirection.DUMP;
-	                }
-	                else if (partInfo.direction == TransferDirection.DUMP)
-	                {
-	                    partInfo.direction = TransferDirection.NONE;
-	                }
+                if (settings.ShowDump)
+                {
+                    if (GUILayout.Toggle((partInfo.direction == TransferDirection.DUMP), "Dump", popupButtonStyle))
+                    {
+                        partInfo.direction = TransferDirection.DUMP;
+                    }
+                    else if (partInfo.direction == TransferDirection.DUMP)
+                    {
+                        partInfo.direction = TransferDirection.NONE;
+                    }
                 }
 
                 if (GUILayout.Toggle((partInfo.direction == TransferDirection.LOCKED), "Lock", popupButtonStyle))
@@ -313,7 +312,14 @@ namespace Tac
                 }
             }
 
-            return false;
+            if (GUI.changed)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private bool DrawEditPopupContents(int windowId, object parameter)
