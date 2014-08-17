@@ -83,10 +83,20 @@
   <Import Project="..\TacLib\Source\CommonProperties.proj" />
   <PropertyGroup>
     <AssemblyMajorVersion>2</AssemblyMajorVersion>
-    <AssemblyMinorVersion>3</AssemblyMinorVersion>
-    <AssemblyFileBuildNumber>0</AssemblyFileBuildNumber>
+    <AssemblyMinorVersion>4</AssemblyMinorVersion>
+    <AssemblyBuildNumber>0</AssemblyBuildNumber>
     <AssemblyFileMajorVersion>$(AssemblyMajorVersion)</AssemblyFileMajorVersion>
     <AssemblyFileMinorVersion>$(AssemblyMinorVersion)</AssemblyFileMinorVersion>
+    <AssemblyFileBuildNumber>$(AssemblyBuildNumber)</AssemblyFileBuildNumber>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Needed for the WriteAvcVersion build target -->
+    <ModName>TAC Fuel Balancer</ModName>
+    <ModUrl>http://ksp-avc.cybutek.net/version.php?id=20</ModUrl>
+    <DownloadUrl></DownloadUrl>
+    <KspVersionMajor>0</KspVersionMajor>
+    <KspVersionMinor>24</KspVersionMinor>
+    <KspVersionPatch>2</KspVersionPatch>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
