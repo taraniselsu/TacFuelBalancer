@@ -20,7 +20,7 @@ namespace Tac
     internal class InstallChecker : MonoBehaviour
     {
         private const string modName = "TAC Fuel Balancer";
-        private const string expectedPath = "ThunderAerospace/TacFuelBalancer";
+        private const string expectedPath = "TacFuelBalancer";
 
         protected void Start()
         {

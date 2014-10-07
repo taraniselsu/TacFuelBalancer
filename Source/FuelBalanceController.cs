@@ -60,7 +60,7 @@ namespace Tac
             mainWindow = new MainWindow(this, settings, settingsWindow, helpWindow);
 
             button = new ButtonWrapper(new Rect(Screen.width * 0.7f, 0, 32, 32),
-                "ThunderAerospace/TacFuelBalancer/Textures/button", "FB",
+                "TacFuelBalancer/Textures/button", "FB",
                 "TAC Fuel Balancer", OnIconClicked);
 
             resources = new Dictionary<string, ResourceInfo>();
