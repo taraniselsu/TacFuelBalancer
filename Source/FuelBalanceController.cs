@@ -145,28 +145,28 @@ namespace Tac
 
                     if (partInfo.direction == TransferDirection.IN)
                     {
-                        TransferIn(Time.deltaTime, resourceInfo, partInfo);
+                        TransferIn(TimeWarp.fixedDeltaTime, resourceInfo, partInfo);
                     }
                     else if (partInfo.direction == TransferDirection.OUT)
                     {
-                        TransferOut(Time.deltaTime, resourceInfo, partInfo);
+                        TransferOut(TimeWarp.fixedDeltaTime, resourceInfo, partInfo);
                     }
                     else if (partInfo.direction == TransferDirection.DUMP)
                     {
-                        DumpOut(Time.deltaTime, resourceInfo, partInfo);
+                        DumpOut(TimeWarp.fixedDeltaTime, resourceInfo, partInfo);
                     }
                 }
 
-                BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.BALANCE
+                BalanceResources(TimeWarp.fixedDeltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.BALANCE
                     || (resourceInfo.balance && rpm.direction == TransferDirection.NONE)));
 
                 if (settings.BalanceIn)
                 {
-                    BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.IN));
+                    BalanceResources(TimeWarp.fixedDeltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.IN));
                 }
                 if (settings.BalanceOut)
                 {
-                    BalanceResources(Time.deltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.OUT));
+                    BalanceResources(TimeWarp.fixedDeltaTime, resourceInfo.parts.FindAll(rpm => rpm.direction == TransferDirection.OUT));
                 }
             }
         }
