@@ -95,7 +95,7 @@ namespace Tac
                     if (partInfo.isSelected)
                     {
                         partInfo.part.SetHighlightColor(Color.blue);
-                        partInfo.part.SetHighlight(true);
+                        partInfo.part.SetHighlight(true, false);
                     }
                 }
             }
