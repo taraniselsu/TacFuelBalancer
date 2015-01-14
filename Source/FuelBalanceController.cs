@@ -35,7 +35,7 @@ using UnityEngine;
 namespace Tac
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    class FuelBalanceController : MonoBehaviour
+    public class FuelBalanceController : MonoBehaviour
     {
         private Settings settings;
         private MainWindow mainWindow;
@@ -43,7 +43,7 @@ namespace Tac
         private HelpWindow helpWindow;
         private string configFilename;
         private ButtonWrapper button;
-        private Dictionary<string, ResourceInfo> resources;
+        public Dictionary<string, ResourceInfo> resources;
         private Vessel currentVessel;
         private int numberOfParts;
         private Vessel.Situations vesselSituation;
