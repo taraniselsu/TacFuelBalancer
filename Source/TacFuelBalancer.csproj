@@ -85,7 +85,7 @@
   <PropertyGroup>
     <AssemblyMajorVersion>2</AssemblyMajorVersion>
     <AssemblyMinorVersion>5</AssemblyMinorVersion>
-    <AssemblyBuildNumber>0</AssemblyBuildNumber>
+    <AssemblyBuildNumber>1</AssemblyBuildNumber>
     <AssemblyFileMajorVersion>$(AssemblyMajorVersion)</AssemblyFileMajorVersion>
     <AssemblyFileMinorVersion>$(AssemblyMinorVersion)</AssemblyFileMinorVersion>
     <AssemblyFileBuildNumber>$(AssemblyBuildNumber)</AssemblyFileBuildNumber>
@@ -97,7 +97,7 @@
     <DownloadUrl></DownloadUrl>
     <KspVersionMajor>1</KspVersionMajor>
     <KspVersionMinor>0</KspVersionMinor>
-    <KspVersionPatch>0</KspVersionPatch>
+    <KspVersionPatch>2</KspVersionPatch>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
